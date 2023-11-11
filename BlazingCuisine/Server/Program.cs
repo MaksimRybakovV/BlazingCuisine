@@ -1,4 +1,7 @@
-using Microsoft.AspNetCore.ResponseCompression;
+using BlazingCuisine.Server.Data;
+using BlazingCuisine.Server.Services.CategoryService;
+using BlazingCuisine.Server.Services.RecipeService;
+using Serilog;
 
 namespace BlazingCuisine
 {
@@ -12,6 +15,19 @@ namespace BlazingCuisine
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
+
+            builder.Services.AddDbContext<ApplicationDataContext>();
+            builder.Services.AddAutoMapper(typeof(Program).Assembly);
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<IRecipeService, RecipeService>();
+
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .WriteTo.File("Logs/BlazingCuisine.txt",
+                    rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
+            builder.Host.UseSerilog();
 
             var app = builder.Build();
 
@@ -33,6 +49,8 @@ namespace BlazingCuisine
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseSerilogRequestLogging();
 
 
             app.MapRazorPages();
