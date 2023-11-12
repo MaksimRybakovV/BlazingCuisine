@@ -4,14 +4,17 @@
         <h5 class="card-title">@Recipe.Name</h5>
         <h6 class="card-subtitle">@Recipe.Category?.Name</h6>
         <ul class="list-group list-group-flush my-2">
-            <li class="list-group-item"><span class="oi oi-clock mr-2"></span> @Recipe.TimeFormatter</li>
-            <li class="list-group-item"><span class="oi oi-star mr-2"></span> @Recipe.Difficulty</li>
+            <li class="list-group-item"><span class="oi oi-clock me-1"></span> @Recipe.TimeFormatter</li>
+            <li class="list-group-item"><span class="oi oi-star me-1"></span> @Recipe.Difficulty</li>
         </ul>
-        <a href="#" class="btn btn-primary">View</a>
+        <button class="btn btn-primary" @onclick="(async () => await OnSelected.InvokeAsync(Recipe))">View</button>
     </div>
 </div>
 
 @code {
     [Parameter, EditorRequired]
     public GetRecipeHeaderDto Recipe { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<GetRecipeHeaderDto> OnSelected { get; set; } = default!;
 }

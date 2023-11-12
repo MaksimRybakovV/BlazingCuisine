@@ -3,18 +3,21 @@
 
 @if(_recipes is null)
 {
-    <p>Loading data...</p>
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
 }
 else
 {
     <div class="container-fluid mt-4">
         <div class="row">
             <div class="col-lg-12 col-md-12">
+                <RecipeDetails Recipe="_selectedRecipe" />
                 <div class="row">
                     @foreach(var recipe in _recipes)
                     {
                         <div class="col-lg-4 col-md-6 mt-4">
-                            <RecipeCard Recipe="recipe"></RecipeCard>
+                            <RecipeCard Recipe="recipe" OnSelected="HandleTrailSelected"></RecipeCard>
                         </div>
                     }
                 </div>
@@ -25,6 +28,7 @@ else
 
 @code {
     private IEnumerable<GetRecipeHeaderDto>? _recipes;
+    private GetRecipeHeaderDto? _selectedRecipe;
 
     protected override async Task OnInitializedAsync()
     {
@@ -39,5 +43,10 @@ else
         {
             Console.WriteLine($"There was a problem loading recipes data: {ex.Message}");
         }
+    }
+
+    private void HandleTrailSelected(GetRecipeHeaderDto trail)
+    {
+        _selectedRecipe = trail;
     }
 }

@@ -1,0 +1,64 @@
+﻿@inject HttpClient _client
+
+<div class="drawer-wrapper @(_isOpen ? "slide" : "")">
+    <div class="drawer-mask"></div>
+    <div class="drawer">
+        @if (_selectedRecipe is not null)
+        {
+            <div class="drawer-content">
+                <img src="@_selectedRecipe.Photo" />
+                <div class="recipe-details">
+                    <h3>@_selectedRecipe.Name</h3>
+                    <div>
+                        <span class="me-3">
+                            <span class="oi oi-clock"></span>
+                            @_selectedRecipe.TimeFormatter
+                        </span>
+                        <span>
+                            <span class="oi oi-star"></span>
+                            @_selectedRecipe.Difficulty
+                        </span>
+                    </div>
+                    <ul class="list-group my-4">
+                        @foreach(var ingredient in _selectedRecipe.Ingredients)
+                        {
+                            <li class="list-group-item">@ingredient</li>
+                        }
+                    </ul>
+                    <p class="mt-4">@_selectedRecipe.Instruction</p>
+                </div>
+            </div>
+            <div class="drawer-controls">
+                <button class="btn btn-secondary"
+                @onclick="Close">
+                    Close
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private bool _isOpen;
+    private GetRecipeDto? _selectedRecipe;
+
+    [Parameter, EditorRequired]
+    public GetRecipeHeaderDto? Recipe { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Recipe is not null)
+        {
+            var response = await _client.GetFromJsonAsync<ServiceResponse<GetRecipeDto>>($"api/recipes/{Recipe.Id}");
+
+            _selectedRecipe = response?.Data;
+            _isOpen = true;
+        }
+    }
+
+    private void Close()
+    {
+        _selectedRecipe = null;
+        _isOpen = false;
+    }
+}

@@ -10,6 +10,7 @@ namespace BlazingCuisine.Server
         {
             CreateMap<AddRecipeDto, Recipe>();
             CreateMap<Recipe, GetRecipeHeaderDto>();
+            CreateMap<Recipe, GetRecipeDto>();
         }
     }
 }
