@@ -11,6 +11,18 @@ namespace BlazingCuisine.Server.Services.RecipeService
         public RecipeService(ApplicationDataContext context, IMapper mapper, ILogger<Recipe> logger) 
             : base(context, mapper, logger) { }
 
+        public async Task<ServiceResponse<int>> AddRecipeAsync(AddRecipeDto newRecipe)
+        {
+            var response = new ServiceResponse<int>();
+            await _context.Recipes.AddAsync(_mapper.Map<Recipe>(newRecipe));
+            await _context.SaveChangesAsync();
+            var recipe = await _context.Recipes
+                .MaxAsync(t => t.Id);
+            response.Data = recipe;
+            _logger.LogInformation("The recipe was created with the values {@newRecipe}.", newRecipe);
+            return response;
+        }
+
         public async Task<ServiceResponse<List<GetRecipeHeaderDto>>> GetAllRecipesAsync()
         {
             var response = new ServiceResponse<List<GetRecipeHeaderDto>>();

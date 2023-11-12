@@ -10,5 +10,6 @@ namespace BlazingCuisine.Server.Services.RecipeService
         public Task<PageServiceResponse<List<GetRecipeHeaderDto>>> GetRecipesByPageAsync(int page, int pageSize);
         public Task<ServiceResponse<List<GetRecipeHeaderDto>>> GetRecipesByCategoryAsync(string category);
         public Task<PageServiceResponse<List<GetRecipeHeaderDto>>> GetCategoryRecipesByPageAsync(string category, int page, int pageSize);
+        public Task<ServiceResponse<int>> AddRecipeAsync(AddRecipeDto newRecipe);
     }
 }

@@ -1,7 +1,43 @@
 ﻿@page "/"
+@inject HttpClient _client
 
-<h3>HomePage</h3>
+@if(_recipes is null)
+{
+    <p>Loading data...</p>
+}
+else
+{
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <div class="row">
+                    @foreach(var recipe in _recipes)
+                    {
+                        <div class="col-lg-4 col-md-6 mt-4">
+                            <RecipeCard Recipe="recipe"></RecipeCard>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
+    private IEnumerable<GetRecipeHeaderDto>? _recipes;
 
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await _client.GetFromJsonAsync<ServiceResponse<List<GetRecipeHeaderDto>>>("api/recipes");
+
+            if (response?.Data is not null)
+                _recipes = response.Data;
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"There was a problem loading recipes data: {ex.Message}");
+        }
+    }
 }
