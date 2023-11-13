@@ -49,7 +49,8 @@ namespace BlazingCuisine.Server.Services.RecipeService
             return response;
         }
 
-        public async Task<PageServiceResponse<List<GetRecipeHeaderDto>>> GetCategoryRecipesByPageAsync(string category, int page, int pageSize)
+        public async Task<PageServiceResponse<List<GetRecipeHeaderDto>>> GetCategoryRecipesByPageAsync
+            (string category, int page, int pageSize, RecipeFilterParameters parameters)
         {
             var response = new PageServiceResponse<List<GetRecipeHeaderDto>>();
 
@@ -61,7 +62,26 @@ namespace BlazingCuisine.Server.Services.RecipeService
                 if (page > pageCount)
                     throw new Exception($"The page {page} does not exist. The maximum number of pages is {pageCount}.");
 
-                var recipes = await _context.Recipes
+                var query = _context.Recipes.AsQueryable();
+
+                if (!string.IsNullOrEmpty(parameters.Category))
+                {
+                    query = query
+                        .Include(r => r.Category)
+                        .Where(e => e.Category!.Name.Contains(parameters.Category));
+                }
+
+                if (parameters.TimeInMinutes.HasValue)
+                {
+                    query = query.Where(e => e.CookingTimeInMinutes <= parameters.TimeInMinutes);
+                }
+
+                if (parameters.Difficulty.HasValue)
+                {
+                    query = query.Where(e => (int)e.Difficulty == parameters.Difficulty);
+                }
+
+                var recipes = await query
                     .Include(r => r.Category)
                     .Where(r => r.Category!.Name == category)
                     .Skip((page - 1) * pageSize)
@@ -160,7 +180,8 @@ namespace BlazingCuisine.Server.Services.RecipeService
             return response;
         }
 
-        public async Task<PageServiceResponse<List<GetRecipeHeaderDto>>> GetRequestedRecipesByPageAsync(string searchTerm, int page, int pageSize)
+        public async Task<PageServiceResponse<List<GetRecipeHeaderDto>>> GetRequestedRecipesByPageAsync
+            (string searchTerm, int page, int pageSize, RecipeFilterParameters parameters)
         {
             var response = new PageServiceResponse<List<GetRecipeHeaderDto>>();
 
@@ -172,7 +193,26 @@ namespace BlazingCuisine.Server.Services.RecipeService
                 if (page > pageCount)
                     throw new Exception($"The page {page} does not exist. The maximum number of pages is {pageCount}.");
 
-                var recipes = await _context.Recipes
+                var query = _context.Recipes.AsQueryable();
+
+                if (!string.IsNullOrEmpty(parameters.Category))
+                {
+                    query = query
+                        .Include(r => r.Category)
+                        .Where(e => e.Category!.Name.Contains(parameters.Category));
+                }
+
+                if (parameters.TimeInMinutes.HasValue)
+                {
+                    query = query.Where(e => e.CookingTimeInMinutes <= parameters.TimeInMinutes);
+                }
+
+                if (parameters.Difficulty.HasValue)
+                {
+                    query = query.Where(e => (int)e.Difficulty == parameters.Difficulty);
+                }
+
+                var recipes = await query
                     .Include(r => r.Category)
                     .Where(r => EF.Functions.Like(r.Name, $"%{searchTerm}%") ||
                         EF.Functions.Like(r.Instruction, $"%{searchTerm}%"))

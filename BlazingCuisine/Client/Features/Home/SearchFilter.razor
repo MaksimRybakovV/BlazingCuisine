@@ -1,0 +1,83 @@
+﻿@inject NavigationManager _navigation
+@inject HttpClient _client
+
+<div class="filters">
+    <label for="category">Category</label>
+    <InputSelect id="category" @bind-Value="_category" class="form-select" style="width: 300px; margin-right: 20px;">
+        @foreach (var category in _categories)
+        {
+            <option value="@category.Name">@category.Name</option>
+        }
+    </InputSelect>
+    <label for="difficulty">Difficulty</label>
+    <InputSelect id="difficulty" @bind-Value="_difficulty" class="form-select" style="width: 100px; margin-right: 20px;">
+        @for (int i = 0; i < Enum.GetNames(typeof(Difficulty)).Length; i++)
+        {
+            <option value="@i">@Enum.GetNames(typeof(Difficulty)).GetValue(i)</option>
+        }
+    </InputSelect>
+    <label for="maxTime">Max Time</label>
+    <input id="maxTime"
+           type="number"
+           class="form-control"
+           @bind="_timeInMinutes" />
+    <button class="btn btn-outline-primary"
+            @onclick="FilterSearchResults" >
+        Filter
+    </button>
+    <button class="btn btn-outline-secondary"
+            @onclick="ClearSearchFilter">
+        Clear
+    </button>
+</div>
+
+@code {
+    private IEnumerable<Category> _categories = new List<Category>();
+    private string _category = string.Empty;
+    private int? _difficulty;
+    private int? _timeInMinutes;
+
+    [Parameter, EditorRequired]
+    public string SearchTerm { get; set; } = default!;
+
+    [Parameter]
+    public string Category { get; set; } = string.Empty;
+
+    [Parameter]
+    public int? TimeInMinutes { get; set; }
+
+    [Parameter]
+    public int? Difficulty { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await _client.GetFromJsonAsync<ServiceResponse<List<Category>>>("api/categories");
+
+        if (response?.Data is not null)
+            _categories = response.Data;
+
+        _category = Category;
+        _timeInMinutes = TimeInMinutes;
+        _difficulty = Difficulty;
+    }
+
+    private void FilterSearchResults()
+    {
+        var uriWithQuerystring = _navigation.GetUriWithQueryParameters (
+        new Dictionary<string, object?>() 
+        {
+            [nameof(SearchPage.Category)] = _category == string.Empty ? null : _category,
+            [nameof(SearchPage.TimeInMinutes)] = _timeInMinutes == null ? null : _timeInMinutes,
+            [nameof(SearchPage.Difficulty)] = _difficulty == null ? null : _difficulty
+        });
+        _navigation.NavigateTo(uriWithQuerystring);
+    }
+
+    private void ClearSearchFilter()
+    {
+        _category = string.Empty;
+        _timeInMinutes = null;
+        _difficulty = null;
+        _navigation.NavigateTo($"/search/{SearchTerm}");
+    }
+}

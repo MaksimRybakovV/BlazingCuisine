@@ -26,6 +26,7 @@ else
     <div class="container-fluid mt-4">
         <RecipeSearch IsHome=false></RecipeSearch>
         <h3 сlass="my-5">Search results for "@SearchTerm"</h3>
+        <SearchFilter SearchTerm="@SearchTerm" Category="@Category" Difficulty="Difficulty" TimeInMinutes="TimeInMinutes"></SearchFilter>
         <div class="row">
             <div class="col-lg-12 col-md-12">
                 <RecipeDetails Recipe="_selectedRecipe" />
@@ -49,6 +50,15 @@ else
     [Parameter]
     public string SearchTerm { get; set; } = default!;
 
+    [Parameter, SupplyParameterFromQuery]
+    public string Category { get; set; } = string.Empty;
+
+    [Parameter, SupplyParameterFromQuery]
+    public int? TimeInMinutes { get; set; }
+
+    [Parameter, SupplyParameterFromQuery]
+    public int? Difficulty { get; set; }
+
     protected async override Task OnParametersSetAsync()
     {
         try
@@ -61,6 +71,29 @@ else
         catch (HttpRequestException ex)
         {
             Console.WriteLine($"There was a problem loading recipes data: {ex.Message}");
+        }
+
+        await UpdateFilters();
+    }
+
+    private async Task UpdateFilters()
+    {
+        if (Category != string.Empty || TimeInMinutes != null || Difficulty != null)
+        {
+            var pointer = _navigation.Uri.IndexOf("?");
+            var str = _navigation.Uri.Substring(pointer + 1);
+
+            try
+            {
+                var response = await _client.GetFromJsonAsync<ServiceResponse<List<GetRecipeHeaderDto>>>($"api/recipes/search/pagination?searchTerm={SearchTerm}&page=1&pagesize=9&{str}");
+
+                if (response?.Data is not null)
+                    _recipes = response.Data;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"There was a problem loading recipes data: {ex.Message}");
+            }
         }
     }
 
