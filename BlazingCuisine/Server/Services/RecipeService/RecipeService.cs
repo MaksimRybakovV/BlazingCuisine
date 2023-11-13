@@ -35,6 +35,20 @@ namespace BlazingCuisine.Server.Services.RecipeService
             return response;
         }
 
+        public async Task<ServiceResponse<List<GetRecipeHeaderDto>>> GetAllRequestedRecipesAsync(string searchTerm)
+        {
+            var response = new ServiceResponse<List<GetRecipeHeaderDto>>();
+
+            response.Data = await _context.Recipes
+                .Include(r => r.Category)
+                .Where(r => EF.Functions.Like(r.Name, $"%{searchTerm}%") ||
+                    EF.Functions.Like(r.Instruction, $"%{searchTerm}%"))
+                .Select(r => _mapper.Map<GetRecipeHeaderDto>(r))
+                .ToListAsync();
+
+            return response;
+        }
+
         public async Task<PageServiceResponse<List<GetRecipeHeaderDto>>> GetCategoryRecipesByPageAsync(string category, int page, int pageSize)
         {
             var response = new PageServiceResponse<List<GetRecipeHeaderDto>>();
@@ -128,6 +142,40 @@ namespace BlazingCuisine.Server.Services.RecipeService
 
                 var recipes = await _context.Recipes
                     .Include(r => r.Category)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(r => _mapper.Map<GetRecipeHeaderDto>(r))
+                    .ToListAsync();
+
+                response.Data = recipes;
+                response.CurrentPage = page;
+                response.PageCount = (int)pageCount;
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccessful = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
+        public async Task<PageServiceResponse<List<GetRecipeHeaderDto>>> GetRequestedRecipesByPageAsync(string searchTerm, int page, int pageSize)
+        {
+            var response = new PageServiceResponse<List<GetRecipeHeaderDto>>();
+
+            try
+            {
+                var pageCount = Math.Ceiling(_context.Recipes.Count() / (float)pageSize);
+                pageCount = Math.Max(pageCount, 1);
+
+                if (page > pageCount)
+                    throw new Exception($"The page {page} does not exist. The maximum number of pages is {pageCount}.");
+
+                var recipes = await _context.Recipes
+                    .Include(r => r.Category)
+                    .Where(r => EF.Functions.Like(r.Name, $"%{searchTerm}%") ||
+                        EF.Functions.Like(r.Instruction, $"%{searchTerm}%"))
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .Select(r => _mapper.Map<GetRecipeHeaderDto>(r))

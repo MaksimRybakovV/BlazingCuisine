@@ -1,7 +1,21 @@
-﻿@page "/"
+﻿@page "/search/{SearchTerm}"
 @inject HttpClient _client
+@inject NavigationManager _navigation
 
-@if(_recipes is null)
+<PageTitle>Search Recipe - Blazing Cuisine</PageTitle>
+
+<div class="container-fluid mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="/">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Search</li>
+        </ol>
+    </nav>
+</div>
+
+@if (_recipes is null)
 {
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -10,12 +24,13 @@
 else
 {
     <div class="container-fluid mt-4">
-        <RecipeSearch IsHome=true></RecipeSearch>
+        <RecipeSearch IsHome=false></RecipeSearch>
+        <h3 сlass="my-5">Search results for "@SearchTerm"</h3>
         <div class="row">
             <div class="col-lg-12 col-md-12">
                 <RecipeDetails Recipe="_selectedRecipe" />
                 <div class="row">
-                    @foreach(var recipe in _recipes)
+                    @foreach (var recipe in _recipes)
                     {
                         <div class="col-lg-4 col-md-6 mt-4">
                             <RecipeCard Recipe="recipe" OnSelected="HandleTrailSelected"></RecipeCard>
@@ -28,14 +43,17 @@ else
 }
 
 @code {
-    private IEnumerable<GetRecipeHeaderDto>? _recipes;
     private GetRecipeHeaderDto? _selectedRecipe;
+    private IEnumerable<GetRecipeHeaderDto>? _recipes;
 
-    protected override async Task OnInitializedAsync()
+    [Parameter]
+    public string SearchTerm { get; set; } = default!;
+
+    protected async override Task OnParametersSetAsync()
     {
         try
         {
-            var response = await _client.GetFromJsonAsync<ServiceResponse<List<GetRecipeHeaderDto>>>("api/recipes");
+            var response = await _client.GetFromJsonAsync<ServiceResponse<List<GetRecipeHeaderDto>>>($"api/recipes/search?searchterm={SearchTerm}");
 
             if (response?.Data is not null)
                 _recipes = response.Data;

@@ -1,0 +1,35 @@
+﻿@inject NavigationManager _navigation
+
+<div class="jumbotron">
+    @if(IsHome)
+    {
+        <h1 class="display-4 text-center">Welcome to Blazing Cuisine!</h1>
+        <p class="lead text-center">
+            Find the most delicious recipes
+            with our search!
+        </p>
+    }
+    <p class="mt-4">
+        <input @onkeydown="SearchForRecipe"
+               @bind="_searchTerm"
+               @bind:event="oninput"
+               type="text"
+               placeholder="Search for a recipe..."
+               class="form-control form-control-lg"/>
+    </p>
+</div>
+
+@code {
+    private string _searchTerm = string.Empty;
+
+    [Parameter]
+    public bool IsHome { get; set; }
+
+    private void SearchForRecipe(KeyboardEventArgs args)
+    {
+        if (args.Key != "Enter")
+            return;
+
+        _navigation.NavigateTo($"/search/{_searchTerm}");
+    }
+}

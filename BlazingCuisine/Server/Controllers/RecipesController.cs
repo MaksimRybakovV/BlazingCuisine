@@ -24,6 +24,14 @@ namespace BlazingCuisine.Server.Controllers
         }
 
         [HttpGet]
+        [Route("search")]
+        public async Task<ActionResult<ServiceResponse<List<GetRecipeHeaderDto>>>> GetAllSearch([FromQuery] string searchTerm)
+        {
+            var response = await _service.GetAllRequestedRecipesAsync(searchTerm);
+            return Ok(response);
+        }
+
+        [HttpGet]
         [Route("category")]
         public async Task<ActionResult<ServiceResponse<List<GetRecipeHeaderDto>>>> GetCategory([FromQuery] string category)
         {
@@ -48,11 +56,24 @@ namespace BlazingCuisine.Server.Controllers
         }
 
         [HttpGet]
-        [Route("pagination")]
+        [Route("category/pagination")]
         public async Task<ActionResult<PageServiceResponse<List<GetRecipeHeaderDto>>>> GetCategoryPage
             ([FromQuery] string category, [FromQuery] int page, [FromQuery] int pageSize)
         {
             var response = await _service.GetCategoryRecipesByPageAsync(category, page, pageSize);
+
+            if (response.Data is null)
+                return NotFound(response);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("search/pagination")]
+        public async Task<ActionResult<PageServiceResponse<List<GetRecipeHeaderDto>>>> GetSearchPage
+            ([FromQuery] string searchTerm, [FromQuery] int page, [FromQuery] int pageSize)
+        {
+            var response = await _service.GetRequestedRecipesByPageAsync(searchTerm, page, pageSize);
 
             if (response.Data is null)
                 return NotFound(response);
