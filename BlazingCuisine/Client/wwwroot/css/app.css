@@ -38,14 +38,6 @@ a:hover {
     text-decoration: none;
 }
 
-.navbar {
-    border-bottom: 2px solid var(--brand);
-    background: linear-gradient(90deg, rgba(255,255,255,1) 5%, 
-        rgba(255,255,255,0) 100%), url("../images/Background.jpg") no-repeat 
-        center;
-    background-size: cover;
-}
-
 .btn-primary {
     background-color: var(--brand);
     border-color: var(--brand);
@@ -71,4 +63,32 @@ a:hover {
     grid-template-columns: repeat(3, 288px);
     column-gap: 123px;
     row-gap: 75px;
+}
+
+.pagination>li>span {
+    background-color: white;
+    color: var(--brand);
+}
+
+.pagination>li>span:focus,
+.pagination>li>span:hover {
+    color: var(--brand);
+    background-color: #eee;
+    border-color: #ddd;
+}
+
+.pagination>.active>span {
+    color: white;
+    background-color: var(--brand) !Important;
+    border: solid 1px var(--brand) !Important;
+}
+
+.pagination > .active > span:hover {
+    background-color: var(--brand) !Important;
+    border: solid 1px var(--brand);
+}
+
+label {
+    display: flex;
+    align-items: center;
 }

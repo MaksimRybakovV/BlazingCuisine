@@ -1,0 +1,69 @@
+﻿@inject NavigationManager _navigation
+
+<nav class="my-4" aria-label="Page navigation.">
+    <ul class="pagination pagination-lg justify-content-center">
+        @if (Page == 1)
+        {
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <span class="page-link" style="cursor:pointer" @onclick="() => ShowPage(Page - 1)">&laquo;</span>
+            </li>
+        }
+        @for (int i = Page - _radius; i <= Math.Min(Page + _radius, PageCount); i++)
+        {
+            int j = i;
+            @if (i > 0)
+            {
+                if (i == Page)
+                {
+                    <li class="page-item active">
+                        <span class="page-link">@i</span>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item">
+                        <span class="page-link" style="cursor:pointer" @onclick="() => ShowPage(j)">@i</span>
+                    </li>
+                }
+            }
+        }
+        @if (Page == PageCount)
+        {
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <span class="page-link" style="cursor:pointer" @onclick="() => ShowPage(Page + 1)">&raquo;</span>
+            </li>
+        }
+    </ul>
+</nav>
+
+@code {
+    private const int _radius = 2;
+
+    [Parameter, EditorRequired]
+    public int Page { get; set; } = 1;
+
+    [Parameter, EditorRequired]
+    public int PageCount { get; set; } = 1;
+
+    private void ShowPage(int page)
+    {
+        var uriWithQuerystring = _navigation.GetUriWithQueryParameters(
+            new Dictionary<string, object?>()
+            {
+                [nameof(SearchPage.Page)] = page
+            });
+        _navigation.NavigateTo(uriWithQuerystring);
+    }
+}

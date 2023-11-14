@@ -34,12 +34,16 @@ else
                     @foreach (var recipe in _recipes)
                     {
                         <div class="col-lg-4 col-md-6 mt-4">
-                            <RecipeCard Recipe="recipe" OnSelected="HandleTrailSelected"></RecipeCard>
+                            <RecipeCard Recipe="recipe" OnSelected="HandleRecipeSelected"></RecipeCard>
                         </div>
                     }
                 </div>
             </div>
         </div>
+        @if(_recipes.Count() > 0)
+        {
+            <CardPagination Page="Page" PageCount="_pageCount"></CardPagination>
+        }
     </div>
 }
 
@@ -47,11 +51,17 @@ else
     private GetRecipeHeaderDto? _selectedRecipe;
     private IEnumerable<GetRecipeHeaderDto>? _recipes;
 
+    private int _pageSize = 1;
+    private int _pageCount;
+
     [Parameter]
     public string SearchTerm { get; set; } = default!;
 
     [Parameter, SupplyParameterFromQuery]
-    public string Category { get; set; } = string.Empty;
+    public int Page { get; set; }
+
+    [Parameter, SupplyParameterFromQuery]
+    public string? Category { get; set; }
 
     [Parameter, SupplyParameterFromQuery]
     public int? TimeInMinutes { get; set; }
@@ -61,43 +71,50 @@ else
 
     protected async override Task OnParametersSetAsync()
     {
+        if (Category == null && TimeInMinutes == null && Difficulty == null)
+            await LoadData(Page, _pageSize);
+        else
+            await UpdateFilters(Page, _pageSize);
+    }
+
+    private async Task LoadData(int page, int pageSize)
+    {
         try
         {
-            var response = await _client.GetFromJsonAsync<ServiceResponse<List<GetRecipeHeaderDto>>>($"api/recipes/search?searchterm={SearchTerm}");
+            var response = await _client.GetFromJsonAsync<PageServiceResponse<List<GetRecipeHeaderDto>>>($"api/recipes/search/pagination?searchterm={SearchTerm}&page={page}&pagesize={pageSize}");
 
             if (response?.Data is not null)
                 _recipes = response.Data;
+
+            _pageCount = response!.PageCount;
         }
         catch (HttpRequestException ex)
         {
             Console.WriteLine($"There was a problem loading recipes data: {ex.Message}");
         }
-
-        await UpdateFilters();
     }
 
-    private async Task UpdateFilters()
+    private async Task UpdateFilters(int page, int pageSize)
     {
-        if (Category != string.Empty || TimeInMinutes != null || Difficulty != null)
+        var pointer = _navigation.Uri.IndexOf("?");
+        var str = _navigation.Uri.Substring(pointer + 8);
+
+        try
         {
-            var pointer = _navigation.Uri.IndexOf("?");
-            var str = _navigation.Uri.Substring(pointer + 1);
+            var response = await _client.GetFromJsonAsync<PageServiceResponse<List<GetRecipeHeaderDto>>>($"api/recipes/search/pagination?searchterm={SearchTerm}&page={page}&pagesize={_pageSize}&{str}");
 
-            try
-            {
-                var response = await _client.GetFromJsonAsync<ServiceResponse<List<GetRecipeHeaderDto>>>($"api/recipes/search/pagination?searchTerm={SearchTerm}&page=1&pagesize=9&{str}");
+            if (response?.Data is not null)
+                _recipes = response.Data;
 
-                if (response?.Data is not null)
-                    _recipes = response.Data;
-            }
-            catch (HttpRequestException ex)
-            {
-                Console.WriteLine($"There was a problem loading recipes data: {ex.Message}");
-            }
+            _pageCount = response!.PageCount;
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"There was a problem loading recipes data: {ex.Message}");
         }
     }
 
-    private void HandleTrailSelected(GetRecipeHeaderDto trail)
+    private void HandleRecipeSelected(GetRecipeHeaderDto trail)
     {
         _selectedRecipe = trail;
     }

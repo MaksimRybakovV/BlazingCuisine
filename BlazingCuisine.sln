@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazingCuisine.Server", "BlazingCuisine\Server\BlazingCuisine.Server.csproj", "{F1F410FC-2A59-45BB-89B9-0D1D9A6ECF3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazingCuisine.Server", "BlazingCuisine\Server\BlazingCuisine.Server.csproj", "{F1F410FC-2A59-45BB-89B9-0D1D9A6ECF3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazingCuisine.Client", "BlazingCuisine\Client\BlazingCuisine.Client.csproj", "{A7F50FFE-599A-4C6A-82D8-6E25753E3BF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazingCuisine.Client", "BlazingCuisine\Client\BlazingCuisine.Client.csproj", "{A7F50FFE-599A-4C6A-82D8-6E25753E3BF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazingCuisine.Shared", "BlazingCuisine\Shared\BlazingCuisine.Shared.csproj", "{7E3C9790-B25A-43AA-8BB8-C2C7A85F3D4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazingCuisine.Shared", "BlazingCuisine\Shared\BlazingCuisine.Shared.csproj", "{7E3C9790-B25A-43AA-8BB8-C2C7A85F3D4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

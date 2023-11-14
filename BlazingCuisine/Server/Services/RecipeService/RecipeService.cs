@@ -56,12 +56,6 @@ namespace BlazingCuisine.Server.Services.RecipeService
 
             try
             {
-                var pageCount = Math.Ceiling(_context.Recipes.Count() / (float)pageSize);
-                pageCount = Math.Max(pageCount, 1);
-
-                if (page > pageCount)
-                    throw new Exception($"The page {page} does not exist. The maximum number of pages is {pageCount}.");
-
                 var query = _context.Recipes.AsQueryable();
 
                 if (!string.IsNullOrEmpty(parameters.Category))
@@ -80,6 +74,12 @@ namespace BlazingCuisine.Server.Services.RecipeService
                 {
                     query = query.Where(e => (int)e.Difficulty == parameters.Difficulty);
                 }
+
+                var pageCount = Math.Ceiling(query.Count() / (float)pageSize);
+                pageCount = Math.Max(pageCount, 1);
+
+                if (page > pageCount)
+                    throw new Exception($"The page {page} does not exist. The maximum number of pages is {pageCount}.");
 
                 var recipes = await query
                     .Include(r => r.Category)
@@ -187,12 +187,6 @@ namespace BlazingCuisine.Server.Services.RecipeService
 
             try
             {
-                var pageCount = Math.Ceiling(_context.Recipes.Count() / (float)pageSize);
-                pageCount = Math.Max(pageCount, 1);
-
-                if (page > pageCount)
-                    throw new Exception($"The page {page} does not exist. The maximum number of pages is {pageCount}.");
-
                 var query = _context.Recipes.AsQueryable();
 
                 if (!string.IsNullOrEmpty(parameters.Category))
@@ -212,10 +206,17 @@ namespace BlazingCuisine.Server.Services.RecipeService
                     query = query.Where(e => (int)e.Difficulty == parameters.Difficulty);
                 }
 
+                query = query.Where(r => EF.Functions.Like(r.Name, $"%{searchTerm}%") ||
+                    EF.Functions.Like(r.Instruction, $"%{searchTerm}%"));
+
+                var pageCount = Math.Ceiling(query.Count() / (float)pageSize);
+                pageCount = Math.Max(pageCount, 1);
+
+                if (page > pageCount)
+                    throw new Exception($"The page {page} does not exist. The maximum number of pages is {pageCount}.");
+
                 var recipes = await query
                     .Include(r => r.Category)
-                    .Where(r => EF.Functions.Like(r.Name, $"%{searchTerm}%") ||
-                        EF.Functions.Like(r.Instruction, $"%{searchTerm}%"))
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .Select(r => _mapper.Map<GetRecipeHeaderDto>(r))

@@ -22,7 +22,7 @@
 @code {
     private string _searchTerm = string.Empty;
 
-    [Parameter]
+    [Parameter, EditorRequired]
     public bool IsHome { get; set; }
 
     private void SearchForRecipe(KeyboardEventArgs args)
@@ -30,6 +30,6 @@
         if (args.Key != "Enter")
             return;
 
-        _navigation.NavigateTo($"/search/{_searchTerm}");
+        _navigation.NavigateTo($"/search/{_searchTerm}?Page=1");
     }
 }

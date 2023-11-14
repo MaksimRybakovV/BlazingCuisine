@@ -1,39 +1,55 @@
 ﻿@inject NavigationManager _navigation
 @inject HttpClient _client
 
-<div class="filters">
-    <label for="category">Category</label>
-    <InputSelect id="category" @bind-Value="_category" class="form-select" style="width: 275px; margin-right: 20px;">
-        @foreach (var category in _categories)
-        {
-            <option value="@category.Name">@category.Name</option>
-        }
-    </InputSelect>
-    <label for="difficulty">Difficulty</label>
-    <InputSelect id="difficulty" @bind-Value="_difficulty" class="form-select" style="width: 110px; margin-right: 20px;">
-        @for (int i = 0; i < Enum.GetNames(typeof(Difficulty)).Length; i++)
-        {
-            <option value="@i">@Enum.GetNames(typeof(Difficulty)).GetValue(i)</option>
-        }
-    </InputSelect>
-    <label for="maxTime">Max Time</label>
-    <input id="maxTime"
-           type="number"
-           class="form-control"
-           @bind="_timeInMinutes" />
-    <button class="btn btn-outline-primary"
-            @onclick="FilterSearchResults" >
-        Filter
-    </button>
-    <button class="btn btn-outline-secondary"
-            @onclick="ClearSearchFilter">
-        Clear
-    </button>
+<div class="navbar navbar-expand-lg filters">
+    <div class="container-fluid">
+        <span class="navbar-brand">Filters</span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+            <form class="d-flex my-2">
+                <label for="category">Category</label>
+                <InputSelect id="category" @bind-Value="_category" class="form-select" style="width: 275px; margin-right: 20px;">
+                    @foreach (var category in _categories)
+                    {
+                        <option value="@category.Name">@category.Name</option>
+                    }
+                </InputSelect>
+            </form>
+            <form class="d-flex my-2">
+                <label for="difficulty">Difficulty</label>
+                <InputSelect id="difficulty" @bind-Value="_difficulty" class="form-select" style="width: 110px; margin-right: 20px;">
+                    @for (int i = 0; i < Enum.GetNames(typeof(Difficulty)).Length; i++)
+                    {
+                        <option value="@i">@Enum.GetNames(typeof(Difficulty)).GetValue(i)</option>
+                    }
+                </InputSelect>
+            </form>
+            <form class="d-flex my-2">
+                <label for="maxTime">Max Time</label>
+                <input id="maxTime"
+                       type="number"
+                       class="form-control"
+                       @bind="_timeInMinutes" />
+            </form>
+            <div class="d-flex my-2">
+                <button class="btn btn-outline-primary"
+                        @onclick="FilterSearchResults">
+                    Filter
+                </button>
+                <button class="btn btn-outline-secondary"
+                        @onclick="ClearSearchFilter">
+                    Clear
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
     private IEnumerable<Category> _categories = new List<Category>();
-    private string _category = string.Empty;
+    private string? _category;
     private int? _difficulty;
     private int? _timeInMinutes;
 
@@ -44,7 +60,7 @@
     public Action OnFiltered { get; set; } = default!;
 
     [Parameter]
-    public string Category { get; set; } = string.Empty;
+    public string? Category { get; set; }
 
     [Parameter]
     public int? TimeInMinutes { get; set; }
@@ -68,21 +84,32 @@
     {
         OnFiltered.Invoke();
         var uriWithQuerystring = _navigation.GetUriWithQueryParameters (
-        new Dictionary<string, object?>() 
-        {
-            [nameof(SearchPage.Category)] = _category == string.Empty ? null : _category,
-            [nameof(SearchPage.TimeInMinutes)] = _timeInMinutes == null ? null : _timeInMinutes,
-            [nameof(SearchPage.Difficulty)] = _difficulty == null ? null : _difficulty
-        });
+            new Dictionary<string, object?>() 
+            {
+                [nameof(SearchPage.Page)] = 1,
+                [nameof(SearchPage.Category)] = _category == null ? null : _category,
+                [nameof(SearchPage.TimeInMinutes)] = _timeInMinutes == null ? null : _timeInMinutes,
+                [nameof(SearchPage.Difficulty)] = _difficulty == null ? null : _difficulty
+            });
         _navigation.NavigateTo(uriWithQuerystring);
     }
 
     private void ClearSearchFilter()
     {
         OnFiltered.Invoke();
-        _category = string.Empty;
+        _category = null;
         _timeInMinutes = null;
         _difficulty = null;
         _navigation.NavigateTo($"/search/{SearchTerm}");
+
+        var uriWithQuerystring = _navigation.GetUriWithQueryParameters(
+            new Dictionary<string, object?>()
+            {
+                [nameof(SearchPage.Page)] = 1,
+                [nameof(SearchPage.Category)] = null,
+                [nameof(SearchPage.TimeInMinutes)] = null,
+                [nameof(SearchPage.Difficulty)] = null
+            });
+        _navigation.NavigateTo(uriWithQuerystring);
     }
 }
