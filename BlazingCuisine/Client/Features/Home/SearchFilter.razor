@@ -3,14 +3,14 @@
 
 <div class="filters">
     <label for="category">Category</label>
-    <InputSelect id="category" @bind-Value="_category" class="form-select" style="width: 300px; margin-right: 20px;">
+    <InputSelect id="category" @bind-Value="_category" class="form-select" style="width: 275px; margin-right: 20px;">
         @foreach (var category in _categories)
         {
             <option value="@category.Name">@category.Name</option>
         }
     </InputSelect>
     <label for="difficulty">Difficulty</label>
-    <InputSelect id="difficulty" @bind-Value="_difficulty" class="form-select" style="width: 100px; margin-right: 20px;">
+    <InputSelect id="difficulty" @bind-Value="_difficulty" class="form-select" style="width: 110px; margin-right: 20px;">
         @for (int i = 0; i < Enum.GetNames(typeof(Difficulty)).Length; i++)
         {
             <option value="@i">@Enum.GetNames(typeof(Difficulty)).GetValue(i)</option>
@@ -40,6 +40,9 @@
     [Parameter, EditorRequired]
     public string SearchTerm { get; set; } = default!;
 
+    [Parameter, EditorRequired]
+    public Action OnFiltered { get; set; } = default!;
+
     [Parameter]
     public string Category { get; set; } = string.Empty;
 
@@ -63,6 +66,7 @@
 
     private void FilterSearchResults()
     {
+        OnFiltered.Invoke();
         var uriWithQuerystring = _navigation.GetUriWithQueryParameters (
         new Dictionary<string, object?>() 
         {
@@ -75,6 +79,7 @@
 
     private void ClearSearchFilter()
     {
+        OnFiltered.Invoke();
         _category = string.Empty;
         _timeInMinutes = null;
         _difficulty = null;

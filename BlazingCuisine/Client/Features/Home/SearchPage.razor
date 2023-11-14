@@ -26,7 +26,7 @@ else
     <div class="container-fluid mt-4">
         <RecipeSearch IsHome=false></RecipeSearch>
         <h3 сlass="my-5">Search results for "@SearchTerm"</h3>
-        <SearchFilter SearchTerm="@SearchTerm" Category="@Category" Difficulty="Difficulty" TimeInMinutes="TimeInMinutes"></SearchFilter>
+        <SearchFilter SearchTerm="@SearchTerm" OnFiltered="HandleUpdateFilters" Category="@Category" Difficulty="Difficulty" TimeInMinutes="TimeInMinutes"></SearchFilter>
         <div class="row">
             <div class="col-lg-12 col-md-12">
                 <RecipeDetails Recipe="_selectedRecipe" />
@@ -100,5 +100,10 @@ else
     private void HandleTrailSelected(GetRecipeHeaderDto trail)
     {
         _selectedRecipe = trail;
+    }
+
+    private void HandleUpdateFilters()
+    {
+        _selectedRecipe = null;
     }
 }
