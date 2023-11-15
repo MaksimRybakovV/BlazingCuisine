@@ -42,7 +42,8 @@ else
         </div>
         @if(_recipes.Count() > 0)
         {
-            <CardPagination Page="Page" PageCount="_pageCount"></CardPagination>
+            <CardPagination IsMobile="true" Page="Page" PageCount="_pageCount"></CardPagination>
+            <CardPagination IsMobile="false" Page="Page" PageCount="_pageCount"></CardPagination>
         }
     </div>
 }

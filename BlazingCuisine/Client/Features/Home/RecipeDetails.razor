@@ -22,7 +22,7 @@
                     <ul class="list-group my-4">
                         @foreach(var ingredient in _selectedRecipe.Ingredients)
                         {
-                            <li class="list-group-item">@ingredient</li>
+                            <li class="list-group-item">@ingredient.Text</li>
                         }
                     </ul>
                     <p class="mt-4">@_selectedRecipe.Instruction</p>
