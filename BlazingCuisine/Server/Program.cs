@@ -1,7 +1,10 @@
 using BlazingCuisine.Server.Data;
 using BlazingCuisine.Server.Services.CategoryService;
 using BlazingCuisine.Server.Services.RecipeService;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Serilog;
+using System.Reflection;
 
 namespace BlazingCuisine
 {
@@ -20,6 +23,9 @@ namespace BlazingCuisine
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IRecipeService, RecipeService>();
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddFluentValidationClientsideAdapters();
+            builder.Services.AddValidatorsFromAssembly(Assembly.Load("BlazingCuisine.Shared"));
 
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()

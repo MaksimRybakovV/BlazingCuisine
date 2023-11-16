@@ -19,6 +19,7 @@
 </div>
 
 <EditForm Model="_recipe" OnValidSubmit="SubmitForm">
+    <FluentValidationValidator />
     <div class="container-fluid my-4">
         <FormSection Title="Basic Details" HelpText="This information is used to identify the recipe and can be used for search to help site visitors find it.">
             <FormFieldSet Width="col-6">
@@ -27,6 +28,7 @@
                 <InputText @bind-Value="_recipe.Name"
                            class="form-control"
                            id="recipeName" />
+                <ValidationMessage For="@(() => _recipe.Name)" />
             </FormFieldSet>
             <FormFieldSet>
                 <label for="recipeInstruction"
@@ -35,6 +37,7 @@
                                rows="6"
                                class="form-control"
                                id="recipeInstruction" />
+                <ValidationMessage For="@(() => _recipe.Instruction)" />
             </FormFieldSet>
         </FormSection>
         <FormSection Title="Difficulty, category and time" HelpText="Help other site visitors choose the best recipes by informing them about the category, difficulty and cooking time.">
@@ -64,9 +67,10 @@
                 <InputNumber @bind-Value="_recipe.CookingTimeInMinutes"
                              class="form-control"
                              id="recipeTime" />
+                <ValidationMessage For="@(() => _recipe.CookingTimeInMinutes)" />
             </FormFieldSet>
         </FormSection>
-        <FormSection Title="Ingredients" HelpText="d">
+        <FormSection Title="Ingredients" HelpText="Add the ingredients needed to prepare the dish.">
             @{
                 var i = 0;
             }
@@ -88,6 +92,7 @@
                             <InputText @bind-Value="ingredient.Text"
                                        class="form-control"
                                        id="recipeIngredient" />
+                            <ValidationMessage For="@(() => ingredient.Text)" />
                         </div>
                     </div>
                     <div class="col-1 d-flex mt-3">
@@ -104,6 +109,7 @@
                     <button class="btn btn-outline-primary"
                             type="button"
                             @onclick=@(() => _recipe.Ingredients.Add(new()))>Add ingredient</button>
+                    <ValidationMessage For="@(() => _recipe.Ingredients)" />
                 </div>
             </div>
         </FormSection>
