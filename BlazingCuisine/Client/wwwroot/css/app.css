@@ -92,3 +92,7 @@ label {
     display: flex;
     align-items: center;
 }
+
+.validation-message {
+    color: red;
+}

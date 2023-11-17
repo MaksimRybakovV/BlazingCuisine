@@ -63,10 +63,9 @@
             </FormFieldSet>
             <FormFieldSet Width="col-3">
                 <label for="recipeTime"
-                       class="fw-bold text-secondary mb-2">Cooking Time In Minutes</label>
-                <InputNumber @bind-Value="_recipe.CookingTimeInMinutes"
-                             class="form-control"
-                             id="recipeTime" />
+                       class="fw-bold text-secondary mb-2">Cooking Time</label>
+                <InputTime @bind-Value="_recipe.CookingTimeInMinutes"
+                           id="recipeTime" />
                 <ValidationMessage For="@(() => _recipe.CookingTimeInMinutes)" />
             </FormFieldSet>
         </FormSection>
@@ -117,7 +116,7 @@
             <div class="col-4 offset-8 text-end">
                 <button class="btn btn-outline-secondary"
                         type="button"
-                        @onclick="@(() => _recipe = new AddRecipeDto { CategoryId = 1, Ingredients = new(), Difficulty = Difficulty.Easy })">
+                        @onclick="HandleReset">
                     Reset
                 </button>
                 <button class="btn btn-primary"
@@ -154,5 +153,17 @@
     private async Task SubmitForm()
     {
         await _client.PostAsJsonAsync("api/recipes", _recipe);
+    }
+
+    private void HandleReset()
+    {
+        _recipe = new AddRecipeDto
+        {
+            CategoryId = 1,
+            Ingredients = new(),
+            Difficulty = Difficulty.Easy
+        };
+        _editContext = new EditContext(_recipe);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }
 }
