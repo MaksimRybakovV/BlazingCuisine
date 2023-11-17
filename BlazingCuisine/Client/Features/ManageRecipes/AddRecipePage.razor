@@ -1,4 +1,5 @@
 ﻿@page "/add-recipe"
+@using System.Net.Http.Headers;
 @inject HttpClient _client
 
 <PageTitle>Add Recipe - Blazing Cuisine</PageTitle>
@@ -38,6 +39,14 @@
                                class="form-control"
                                id="recipeInstruction" />
                 <ValidationMessage For="@(() => _recipe.Instruction)" />
+            </FormFieldSet>
+            <FormFieldSet>
+                <label for="recipeImage"
+                       class="fw-bold text-secondary mb-2">Image</label>
+                <InputFile OnChange="LoadRecipeImage"
+                           class="form-control"
+                           accept=".png,.jpg,.jpeg"/>
+                <p>@_fileText</p>
             </FormFieldSet>
         </FormSection>
         <FormSection Title="Difficulty, category and time" HelpText="Help other site visitors choose the best recipes by informing them about the category, difficulty and cooking time.">
@@ -135,6 +144,8 @@
         Difficulty = Difficulty.Easy
     };
     private IEnumerable<Category> _categories = new List<Category>();
+    private IBrowserFile? _recipeImage;
+    private string _fileText = default!;
 
     protected override void OnInitialized()
     {
@@ -150,9 +161,53 @@
             _categories = response.Data;
     }
 
+    private void LoadRecipeImage(InputFileChangeEventArgs args)
+    {
+        _recipeImage = args.File;
+    }
+
     private async Task SubmitForm()
     {
-        await _client.PostAsJsonAsync("api/recipes", _recipe);
+        int id = 0;
+        var response = await _client.PostAsJsonAsync("api/recipes", _recipe);
+        var deserializedResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<int>>();
+
+        if (deserializedResponse?.IsSuccessful == true)
+            id = deserializedResponse.Data;
+
+        if(_recipeImage is not null)
+        {
+            long maxFileSize = 1024 * (1024 * 5);
+            var upload = false;
+            using var content = new MultipartFormDataContent();
+
+            try
+            {
+                var file = _recipeImage;
+                var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+
+                content.Add(
+                    content: fileContent,
+                    name: "\"files\"",
+                    fileName: file.Name);
+
+                upload = true;
+            }
+            catch (Exception ex)
+            {
+                _fileText = ex.Message;
+            }
+
+            if(upload)
+            {
+                var fileResponse = await _client.PostAsync($"api/files?id={id}", content);
+                var deserializedFileResponse = await fileResponse.Content.ReadFromJsonAsync<UploadResult>();
+
+                if(deserializedFileResponse!.IsUploaded == true)
+                    _fileText = "File has been successfully uploaded.";
+            }
+        }
     }
 
     private void HandleReset()

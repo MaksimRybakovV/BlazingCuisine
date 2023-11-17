@@ -1,5 +1,6 @@
 using BlazingCuisine.Server.Data;
 using BlazingCuisine.Server.Services.CategoryService;
+using BlazingCuisine.Server.Services.FileService;
 using BlazingCuisine.Server.Services.RecipeService;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -23,6 +24,7 @@ namespace BlazingCuisine
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IRecipeService, RecipeService>();
+            builder.Services.AddScoped<IFileService, FileService>();
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddFluentValidationClientsideAdapters();
             builder.Services.AddValidatorsFromAssembly(Assembly.Load("BlazingCuisine.Shared"));
