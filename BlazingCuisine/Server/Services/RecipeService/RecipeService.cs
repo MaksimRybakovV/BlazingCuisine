@@ -234,5 +234,39 @@ namespace BlazingCuisine.Server.Services.RecipeService
 
             return response;
         }
+
+        public async Task<ServiceResponse<UpdateRecipeDto>> UpdateRecipeAsync(UpdateRecipeDto updatedRecipe)
+        {
+            var response = new ServiceResponse<UpdateRecipeDto>();
+
+            try
+            {
+                var recipe = await _context.Recipes
+                    .SingleOrDefaultAsync(r => r.Id == updatedRecipe.Id)
+                    ?? throw new Exception($"Recipe with Id '{updatedRecipe.Id}' not found!");
+
+                recipe.Instruction = updatedRecipe.Instruction;
+                recipe.Ingredients = updatedRecipe.Ingredients;
+                recipe.Name = updatedRecipe.Name;
+                recipe.Photo = updatedRecipe.Photo;
+                recipe.CookingTimeInMinutes = updatedRecipe.CookingTimeInMinutes;
+                recipe.Category = updatedRecipe.Category;
+                recipe.CategoryId = updatedRecipe.CategoryId;
+                recipe.Difficulty = updatedRecipe.Difficulty;
+
+                await _context.SaveChangesAsync();
+                response.Data = updatedRecipe;
+                _logger.LogInformation("The recipe with ID '{updatedRecipe.Id}' has been updated " +
+                    "with values {@updatedRecipe}.", updatedRecipe.Id, updatedRecipe);
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccessful = false;
+                response.Message = ex.Message;
+                _logger.LogError("The recipe with ID '{updatedRecipe.Id}' not found.", updatedRecipe.Id);
+            }
+
+            return response;
+        }
     }
 }

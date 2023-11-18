@@ -99,5 +99,17 @@ namespace BlazingCuisine.Server.Controllers
             var response = await _service.AddRecipeAsync(newRecipe);
             return Ok(response);
         }
+
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<ActionResult<ServiceResponse<int>>> PutRecipe(UpdateRecipeDto updatedRecipe)
+        {
+            var response = await _service.UpdateRecipeAsync(updatedRecipe);
+
+            if (response.Data is null)
+                return NotFound(response);
+
+            return Ok(response);
+        }
     }
 }

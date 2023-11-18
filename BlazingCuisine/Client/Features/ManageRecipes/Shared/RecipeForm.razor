@@ -1,0 +1,343 @@
+﻿@using System.Net.Http.Headers;
+@inject HttpClient _client
+
+<EditForm OnValidSubmit="SubmitForm" EditContext="_editContext">
+    <FluentValidationValidator />
+    <div class="container-fluid my-4">
+        <FormSection Title="Basic Details" HelpText="This information is used to identify the recipe and can be used for search to help site visitors find it.">
+            <FormFieldSet Width="col-6">
+                <label for="recipeName"
+                       class="fw-bold text-secondary mb-2">Name</label>
+                @if (UpdatedRecipe == null)
+                {
+                    <InputText @bind-Value="_recipe.Name"
+                               class="form-control"
+                               id="recipeName" />
+                    <ValidationMessage For="@(() => _recipe.Name)" />
+                }
+                else
+                {
+                    <InputText @bind-Value="_updatedRecipe!.Name"
+                               class="form-control"
+                               id="recipeName" />
+                    <ValidationMessage For="@(() => _updatedRecipe!.Name)" />
+                }
+            </FormFieldSet>
+            <FormFieldSet>
+                <label for="recipeInstruction"
+                       class="fw-bold text-secondary mb-2">Instruction</label>
+                @if (UpdatedRecipe == null)
+                {
+                    <InputTextArea @bind-Value="_recipe.Instruction"
+                                   rows="6"
+                                   class="form-control"
+                                   id="recipeInstruction" />
+                    <ValidationMessage For="@(() => _recipe.Instruction)" />
+                }
+                else
+                {
+                    <InputTextArea @bind-Value="_updatedRecipe!.Instruction"
+                                   rows="6"
+                                   class="form-control"
+                                   id="recipeInstruction" />
+                    <ValidationMessage For="@(() => _updatedRecipe!.Instruction)" />
+                }
+            </FormFieldSet>
+            <FormFieldSet>
+                @if(UpdatedRecipe == null)
+                {
+                    <label for="recipeImage"
+                           class="fw-bold text-secondary mb-2">Image</label>
+                    <InputFile OnChange="LoadRecipeImage"
+                               class="form-control"
+                               accept=".png,.jpg,.jpeg" />
+                }
+                else
+                {
+                    if(_updatedRecipe!.Photo == "")
+                    {
+                        <label for="recipeImage"
+                               class="fw-bold text-secondary mb-2">Image</label>
+                        <InputFile OnChange="LoadRecipeImage"
+                                   class="form-control"
+                                   accept=".png,.jpg,.jpeg" />
+                    }
+                    else
+                    {
+                        <div class="card bg-dark text-white">
+                            <img src="@_updatedRecipe!.Photo" />
+                            <div class="card-img-overlay">
+                                <button class="btn btn-primary btn-sm"
+                                @onclick="RemoveRecipeImage">
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+            </FormFieldSet>
+        </FormSection>
+        <FormSection Title="Difficulty, category and time" HelpText="Help other site visitors choose the best recipes by informing them about the category, difficulty and cooking time.">
+            <FormFieldSet Width="col-3">
+                <label for="recipeDifficulty"
+                       class="fw-bold text-secondary mb-2">Difficulty</label>
+                @if (UpdatedRecipe == null)
+                {
+                    <InputSelect id="recipeDifficulty" @bind-Value="_recipe.Difficulty" class="form-select">
+                        @foreach (var difficulty in Enum.GetValues(typeof(Difficulty)))
+                        {
+                            <option value="@difficulty">@difficulty</option>
+                        }
+                    </InputSelect>
+                }
+                else
+                {
+                    <InputSelect id="recipeDifficulty" @bind-Value="_updatedRecipe!.Difficulty" class="form-select">
+                        @foreach (var difficulty in Enum.GetValues(typeof(Difficulty)))
+                        {
+                            <option value="@difficulty">@difficulty</option>
+                        }
+                    </InputSelect>
+                }
+            </FormFieldSet>
+            <FormFieldSet Width="col-3">
+                <label for="recipeCategory"
+                       class="fw-bold text-secondary mb-2">Category</label>
+                @if (UpdatedRecipe == null)
+                {
+                    <InputSelect id="recipeCategory" @bind-Value="_recipe.CategoryId" class="form-select">
+                        @foreach (var category in _categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </InputSelect>
+                }
+                else
+                {
+                    <InputSelect id="recipeCategory" @bind-Value="_updatedRecipe!.CategoryId" class="form-select">
+                        @foreach (var category in _categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </InputSelect>
+                }
+            </FormFieldSet>
+            <FormFieldSet Width="col-3">
+                <label for="recipeTime"
+                       class="fw-bold text-secondary mb-2">Cooking Time</label>
+                @if (UpdatedRecipe == null)
+                {
+                    <InputTime @bind-Value="_recipe.CookingTimeInMinutes"
+                               id="recipeTime" />
+                    <ValidationMessage For="@(() => _recipe.CookingTimeInMinutes)" />
+                }
+                else
+                {
+                    <InputTime @bind-Value="_recipe.CookingTimeInMinutes"
+                               id="recipeTime" />
+                    <ValidationMessage For="@(() => _updatedRecipe!.CookingTimeInMinutes)" />
+                }
+            </FormFieldSet>
+        </FormSection>
+        <FormSection Title="Ingredients" HelpText="Add the ingredients needed to prepare the dish.">
+            @{
+                var i = 0;
+            }
+            @if (UpdatedRecipe == null)
+            {
+                foreach (var ingredient in _recipe.Ingredients)
+                {
+                    i++;
+
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="mb-3">
+                                <label class="fw-bold text-secondary mb-2">Ingredient</label>
+                                <p>@i</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="recipeIngredient"
+                                       class="fw-bold text-secondary mb-2">Description</label>
+                                <InputText @bind-Value="ingredient.Text"
+                                           class="form-control"
+                                           id="recipeIngredient" />
+                                <ValidationMessage For="@(() => ingredient.Text)" />
+                            </div>
+                        </div>
+                        <div class="col-1 d-flex mt-3">
+                            <button class="btn btn-link"
+                                    type="button"
+                            @onclick="@(() => _recipe.Ingredients.Remove(ingredient))">
+                                <i class="fa-regular fa-circle-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-outline-primary"
+                                type="button"
+                        @onclick=@(() => _recipe.Ingredients.Add(new()))>
+                            Add ingredient
+                        </button>
+                        <ValidationMessage For="@(() => _recipe.Ingredients)" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                foreach (var ingredient in _updatedRecipe!.Ingredients)
+                {
+                    i++;
+
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="mb-3">
+                                <label class="fw-bold text-secondary mb-2">Ingredient</label>
+                                <p>@i</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="recipeIngredient"
+                                       class="fw-bold text-secondary mb-2">Description</label>
+                                <InputText @bind-Value="ingredient.Text"
+                                           class="form-control"
+                                           id="recipeIngredient" />
+                                <ValidationMessage For="@(() => ingredient.Text)" />
+                            </div>
+                        </div>
+                        <div class="col-1 d-flex mt-3">
+                            <button class="btn btn-link"
+                                    type="button"
+                            @onclick="@(() => _updatedRecipe!.Ingredients.Remove(ingredient))">
+                                <i class="fa-regular fa-circle-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-outline-primary"
+                                type="button"
+                        @onclick=@(() => _updatedRecipe!.Ingredients.Add(new()))>
+                            Add ingredient
+                        </button>
+                        <ValidationMessage For="@(() => _updatedRecipe!.Ingredients)" />
+                    </div>
+                </div>
+            }
+        </FormSection>
+        <div class="row">
+            <div class="col text-end">
+                <button class="btn btn-outline-secondary"
+                        type="button"
+                        @onclick="ResetForm">
+                    Reset
+                </button>
+                <button class="btn btn-primary"
+                        type="submit">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private EditContext _editContext = default!;
+    private AddRecipeDto _recipe = new AddRecipeDto
+    {
+        CategoryId = 1,
+        Ingredients = new(),
+        Difficulty = Difficulty.Easy
+    };
+    private UpdateRecipeDto? _updatedRecipe;
+    private IEnumerable<Category> _categories = new List<Category>();
+    private IBrowserFile? _recipeImage;
+
+    [Parameter, EditorRequired]
+    public bool IsNewRecipe { get; set; }
+
+    [Parameter]
+    public UpdateRecipeDto? UpdatedRecipe { get; set; } = default!;
+
+    [Parameter]
+    public Func<AddRecipeDto, IBrowserFile?, Task> OnAddSubmit { get; set; } = default!;
+
+    [Parameter]
+    public Func<UpdateRecipeDto, IBrowserFile?, Task> OnEditSubmit { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        _updatedRecipe = UpdatedRecipe;
+        if (UpdatedRecipe == null)
+            _editContext = new EditContext(_recipe);
+        else
+            _editContext = new EditContext(_updatedRecipe!);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+    }
+
+    protected override void OnParametersSet()
+    {
+        _updatedRecipe = UpdatedRecipe;
+        if(UpdatedRecipe == null)
+            _editContext = new EditContext(_recipe);
+        else
+            _editContext = new EditContext(_updatedRecipe!);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var response = await _client.GetFromJsonAsync<ServiceResponse<List<Category>>>("api/categories");
+
+        if (response!.Data is not null)
+            _categories = response.Data;
+    }
+
+    private void LoadRecipeImage(InputFileChangeEventArgs args)
+    {
+        _recipeImage = args.File;
+        _updatedRecipe!.ImageAction = ImageAction.Add;
+    }
+
+    private void RemoveRecipeImage()
+    {
+        _updatedRecipe!.Photo = "";
+        _updatedRecipe.ImageAction = ImageAction.Remove;
+    }
+
+    private async Task SubmitForm()
+    {
+        if (IsNewRecipe)
+            await OnAddSubmit(_recipe, _recipeImage);
+        else
+            await OnEditSubmit(_updatedRecipe!, _recipeImage);
+    }
+
+    public void ResetForm()
+    {
+        if(UpdatedRecipe == null)
+        {
+            _recipe = new AddRecipeDto
+            {
+                CategoryId = 1,
+                Ingredients = new(),
+                Difficulty = Difficulty.Easy
+            };
+            _editContext = new EditContext(_recipe);
+            _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+            _recipeImage = null;
+        }
+        else
+        {
+            _updatedRecipe = UpdatedRecipe;
+            _editContext = new EditContext(_updatedRecipe!);
+            _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+            _recipeImage = null;
+        }
+    }
+}

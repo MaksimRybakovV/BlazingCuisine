@@ -1,0 +1,96 @@
+﻿@page "/add-recipe"
+@using System.Net.Http.Headers;
+@inject HttpClient _client
+
+<PageTitle>Add Recipe - Blazing Cuisine</PageTitle>
+
+<div class="container-fluid mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="/">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Add Recipe</li>
+        </ol>
+    </nav>
+</div>
+
+@if(_submitSuccessful)
+{
+    <SuccessAlert Message="Your recipe has been added successfully!" />
+}
+
+@if(_errorMessage is not null)
+{
+    <ErrorAlert Message="@_errorMessage"/>
+}
+
+<div class="container-fluid">
+    <h3 class="my-4">Add a recipe</h3>
+</div>
+
+<RecipeForm @ref="_recipeForm" IsNewRecipe="true" OnAddSubmit="AddRecipe" />
+
+@code {
+    private RecipeForm _recipeForm = default!;
+    private bool _submitSuccessful;
+    private string? _errorMessage;
+
+    private async Task AddRecipe(AddRecipeDto newRecipe, IBrowserFile requestedFile)
+    {
+        int id = 0;
+        var response = await _client.PostAsJsonAsync("api/recipes", newRecipe);
+        var deserializedResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<int>>();
+
+        if (deserializedResponse?.IsSuccessful == true)
+            id = deserializedResponse.Data;
+
+        if (requestedFile is not null)
+        {
+            long maxFileSize = 1024 * (1024 * 5);
+            var upload = false;
+            using var content = new MultipartFormDataContent();
+
+            try
+            {
+                var file = requestedFile;
+                var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+
+                content.Add(
+                    content: fileContent,
+                    name: "\"files\"",
+                    fileName: file.Name);
+
+                upload = true;
+            }
+            catch (Exception ex)
+            {
+                _submitSuccessful = true;
+                _errorMessage = ex.Message;
+                StateHasChanged();
+            }
+
+            if (upload)
+            {
+                var fileResponse = await _client.PostAsync($"api/files?id={id}", content);
+                var deserializedFileResponse = await fileResponse.Content.ReadFromJsonAsync<UploadResult>();
+
+                _submitSuccessful = true;
+
+                if (deserializedFileResponse!.IsUploaded == false)
+                {
+                    _errorMessage = "The file could not be uploaded.";
+                }
+
+                _recipeForm.ResetForm();
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            _submitSuccessful = true;
+            StateHasChanged();
+        }
+    }
+}

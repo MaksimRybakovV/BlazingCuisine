@@ -1,0 +1,9 @@
+﻿<div class="alert alert-success">
+    <i class="fa-regular fa-circle-check"></i>
+    @Message
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Message { get; set; } = default!;
+}

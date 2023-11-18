@@ -11,6 +11,7 @@ namespace BlazingCuisine.Shared.Dtos.Recipe
         public int CookingTimeInMinutes { get; set; }
         public string TimeFormatter => $"{CookingTimeInMinutes / 60}h, {CookingTimeInMinutes % 60}m";
         public Category? Category { get; set; }
+        public int CategoryId { get; set; }
         public Difficulty Difficulty { get; set; } = Difficulty.Easy;
     }
 }

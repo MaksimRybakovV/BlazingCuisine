@@ -17,9 +17,9 @@ namespace BlazingCuisine.Shared.Dtos.Recipe
         public Difficulty Difficulty { get; set; } = Difficulty.Easy;
     }
 
-    public class RecipeValidator: AbstractValidator<AddRecipeDto>
+    public class RecipeAddValidator: AbstractValidator<AddRecipeDto>
     {
-        public RecipeValidator()
+        public RecipeAddValidator()
         {
             RuleFor(r => r.Name)
                 .NotEmpty()

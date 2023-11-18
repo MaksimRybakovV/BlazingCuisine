@@ -1,0 +1,152 @@
+﻿@page "/edit-recipe/{RecipeId:int}"
+@using System.Net.Http.Headers;
+@inject HttpClient _client
+
+<h3>EditTrailPage</h3>
+
+<div class="container-fluid mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="/">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Edit Recipe</li>
+        </ol>
+    </nav>
+</div>
+
+@if(_isLoading)
+{
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+}
+else
+{
+    @if (_submitSuccessful)
+    {
+        <SuccessAlert Message="Your recipe has been added successfully!" />
+    }
+
+    @if (_errorMessage is not null)
+    {
+        <ErrorAlert Message="@_errorMessage" />
+    }
+
+    <div class="container-fluid">
+        <h3 class="my-4">Editing recipe: @_recipe.Name</h3>
+    </div>
+
+    <RecipeForm @ref="_recipeForm" IsNewRecipe="false" UpdatedRecipe="_recipe" OnEditSubmit="EditRecipe" />
+}
+
+@code {
+    private bool _isLoading;
+    private RecipeForm _recipeForm = default!;
+    private bool _submitSuccessful;
+    private string? _errorMessage;
+    private UpdateRecipeDto _recipe = new();
+
+    [Parameter]
+    public int RecipeId { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        var response = await _client.GetFromJsonAsync<ServiceResponse<GetRecipeDto>>($"api/recipes/{RecipeId}");
+
+        if(response!.Data is not null)
+        {
+            _recipe.Id = response.Data.Id;
+            _recipe.Name = response.Data.Name;
+            _recipe.Photo = response.Data.Photo;
+            _recipe.Instruction = response.Data.Instruction;
+            _recipe.Ingredients = response.Data.Ingredients;
+            _recipe.CookingTimeInMinutes = response.Data.CookingTimeInMinutes;
+            _recipe.CategoryId = response.Data.CategoryId;
+            _recipe.Difficulty = response.Data.Difficulty;
+        }
+        else
+        {
+            _errorMessage = "There was a problem loading the recipe.";
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task EditRecipe(UpdateRecipeDto updatedRecipe, IBrowserFile requestedFile)
+    {
+        var response = await _client.PutAsJsonAsync($"api/recipes/{updatedRecipe.Id}", updatedRecipe);
+        var deserializedResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<UpdateRecipeDto>>();
+
+        if (deserializedResponse?.IsSuccessful == false)
+        {
+            _submitSuccessful = false;
+            _errorMessage = "There was a problem saving your recipe.";
+        }
+        else
+        {
+            var recipe = deserializedResponse!.Data;
+
+            _recipe.Id = recipe!.Id;
+            _recipe.Name = recipe.Name;
+            _recipe.Instruction = recipe.Instruction;
+            _recipe.Ingredients = recipe.Ingredients;
+            _recipe.CookingTimeInMinutes = recipe.CookingTimeInMinutes;
+            _recipe.CategoryId = recipe.CategoryId;
+            _recipe.Difficulty = recipe.Difficulty;
+
+            if (recipe.ImageAction == ImageAction.Remove)
+            {
+                _recipe.Photo = "";
+            }
+            if(recipe.ImageAction == ImageAction.Add)
+            {
+                if (requestedFile is not null)
+                {
+                    long maxFileSize = 1024 * (1024 * 5);
+                    var upload = false;
+                    using var content = new MultipartFormDataContent();
+
+                    try
+                    {
+                        var file = requestedFile;
+                        var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
+                        fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+
+                        content.Add(
+                            content: fileContent,
+                            name: "\"files\"",
+                            fileName: file.Name);
+
+                        upload = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        _submitSuccessful = true;
+                        _errorMessage = ex.Message;
+                    }
+
+                    if (upload)
+                    {
+                        var fileResponse = await _client.PostAsync($"api/files?id={recipe.Id}", content);
+                        var deserializedFileResponse = await fileResponse.Content.ReadFromJsonAsync<UploadResult>();
+
+                        recipe.Photo = $"images/recipe/{deserializedFileResponse!.StoredFileName}";
+                        _recipe.Photo = recipe.Photo;
+                        _submitSuccessful = true;
+
+                        if (deserializedFileResponse!.IsUploaded == false)
+                        {
+                            _errorMessage = "The file could not be uploaded.";
+                        }
+                    }
+                }
+            }
+            
+            _submitSuccessful = true;
+            StateHasChanged();
+        }
+    }
+}
