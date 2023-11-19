@@ -16,3 +16,13 @@
 .input-time>div label {
     margin-bottom: 0;
 }
+
+@media (max-width: 770px) {
+    .input-time {
+        display: block;
+    }
+
+    .input-time>div {
+        margin-top: 20px;
+    }
+}

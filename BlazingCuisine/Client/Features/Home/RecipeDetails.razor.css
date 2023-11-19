@@ -52,3 +52,9 @@
     padding: 20px;
     background-color: #ffffff;
 }
+
+@media (max-width: 770px) {
+    .drawer {
+        width: 100vw;
+    }
+}

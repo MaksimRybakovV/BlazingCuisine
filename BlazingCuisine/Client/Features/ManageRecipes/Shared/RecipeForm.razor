@@ -5,7 +5,7 @@
     <FluentValidationValidator />
     <div class="container-fluid my-4">
         <FormSection Title="Basic Details" HelpText="This information is used to identify the recipe and can be used for search to help site visitors find it.">
-            <FormFieldSet Width="col-6">
+            <FormFieldSet Width="col-lg-6 col-md-12">
                 <label for="recipeName"
                        class="fw-bold text-secondary mb-2">Name</label>
                 @if (UpdatedRecipe == null)
@@ -78,7 +78,7 @@
             </FormFieldSet>
         </FormSection>
         <FormSection Title="Difficulty, category and time" HelpText="Help other site visitors choose the best recipes by informing them about the category, difficulty and cooking time.">
-            <FormFieldSet Width="col-3">
+            <FormFieldSet Width="col-lg-6 col-md-12">
                 <label for="recipeDifficulty"
                        class="fw-bold text-secondary mb-2">Difficulty</label>
                 @if (UpdatedRecipe == null)
@@ -100,7 +100,7 @@
                     </InputSelect>
                 }
             </FormFieldSet>
-            <FormFieldSet Width="col-3">
+            <FormFieldSet Width="col-lg-6 col-md-12">
                 <label for="recipeCategory"
                        class="fw-bold text-secondary mb-2">Category</label>
                 @if (UpdatedRecipe == null)
@@ -122,7 +122,7 @@
                     </InputSelect>
                 }
             </FormFieldSet>
-            <FormFieldSet Width="col-3">
+            <FormFieldSet Width="col-lg-3 col-md-12">
                 <label for="recipeTime"
                        class="fw-bold text-secondary mb-2">Cooking Time</label>
                 @if (UpdatedRecipe == null)
@@ -150,13 +150,13 @@
                     i++;
 
                     <div class="row">
-                        <div class="col-2">
-                            <div class="mb-3">
+                        <div class="col-lg-2 col-md-12 col-sm-12 col-12">
+                            <div class="d-lg-block d-md-flex d-sm-flex d-flex mb-3">
                                 <label class="fw-bold text-secondary mb-2">Ingredient</label>
-                                <p>@i</p>
+                                <p class="mb-lg-0 mb-md-2 mb-sm-2 mb-2 ms-lg-0 ms-md-3 ms-sm-3 ms-3">@i</p>
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col-lg-6 col-md-10 col-sm-10 col-9">
                             <div class="mb-3">
                                 <label for="recipeIngredient"
                                        class="fw-bold text-secondary mb-2">Description</label>
@@ -166,7 +166,7 @@
                                 <ValidationMessage For="@(() => ingredient.Text)" />
                             </div>
                         </div>
-                        <div class="col-1 d-flex mt-3">
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-1 d-flex mt-3">
                             <button class="btn btn-link"
                                     type="button"
                             @onclick="@(() => _recipe.Ingredients.Remove(ingredient))">
@@ -193,13 +193,13 @@
                     i++;
 
                     <div class="row">
-                        <div class="col-2">
-                            <div class="mb-3">
+                        <div class="col-lg-2 col-md-12 col-sm-12 col-12">
+                            <div class="d-lg-block d-md-flex d-sm-flex d-flex mb-3">
                                 <label class="fw-bold text-secondary mb-2">Ingredient</label>
-                                <p>@i</p>
+                                <p class="mb-lg-0 mb-md-2 mb-sm-2 mb-2 ms-lg-0 ms-md-3 ms-sm-3 ms-3">@i</p>
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col-lg-6 col-md-10 col-sm-10 col-9">
                             <div class="mb-3">
                                 <label for="recipeIngredient"
                                        class="fw-bold text-secondary mb-2">Description</label>
@@ -209,7 +209,7 @@
                                 <ValidationMessage For="@(() => ingredient.Text)" />
                             </div>
                         </div>
-                        <div class="col-1 d-flex mt-3">
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-1 d-flex mt-3">
                             <button class="btn btn-link"
                                     type="button"
                             @onclick="@(() => _updatedRecipe!.Ingredients.Remove(ingredient))">
