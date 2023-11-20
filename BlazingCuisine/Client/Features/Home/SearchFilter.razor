@@ -86,10 +86,10 @@
         var uriWithQuerystring = _navigation.GetUriWithQueryParameters (
             new Dictionary<string, object?>() 
             {
-                [nameof(SearchPage.Page)] = 1,
-                [nameof(SearchPage.Category)] = _category == null ? null : _category,
-                [nameof(SearchPage.TimeInMinutes)] = _timeInMinutes == null ? null : _timeInMinutes,
-                [nameof(SearchPage.Difficulty)] = _difficulty == null ? null : _difficulty
+                ["Page"] = 1,
+                ["Category"] = _category == null ? null : _category,
+                ["TimeInMinutes"] = _timeInMinutes == null ? null : _timeInMinutes,
+                ["Difficulty"] = _difficulty == null ? null : _difficulty
             });
         _navigation.NavigateTo(uriWithQuerystring);
     }
@@ -105,10 +105,10 @@
         var uriWithQuerystring = _navigation.GetUriWithQueryParameters(
             new Dictionary<string, object?>()
             {
-                [nameof(SearchPage.Page)] = 1,
-                [nameof(SearchPage.Category)] = null,
-                [nameof(SearchPage.TimeInMinutes)] = null,
-                [nameof(SearchPage.Difficulty)] = null
+                ["Page"] = 1,
+                ["Category"] = null,
+                ["TimeInMinutes"] = null,
+                ["Difficulty"] = null
             });
         _navigation.NavigateTo(uriWithQuerystring);
     }

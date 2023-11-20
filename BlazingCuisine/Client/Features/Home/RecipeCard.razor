@@ -7,7 +7,9 @@
             <li class="list-group-item"><span class="oi oi-clock me-1"></span> @Recipe.TimeFormatter</li>
             <li class="list-group-item"><span class="oi oi-star me-1"></span> @Recipe.Difficulty</li>
         </ul>
-        <button class="btn btn-primary" @onclick="(async () => await OnSelected.InvokeAsync(Recipe))">View</button>
+        <button class="btn btn-primary" @onclick="(async () => await OnSelected.InvokeAsync(Recipe))">
+            <i class="fa-regular fa-eye"></i>
+        </button>
     </div>
 </div>
 

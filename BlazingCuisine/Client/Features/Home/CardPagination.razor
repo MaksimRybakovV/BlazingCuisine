@@ -65,7 +65,7 @@
         var uriWithQuerystring = _navigation.GetUriWithQueryParameters(
             new Dictionary<string, object?>()
             {
-                [nameof(SearchPage.Page)] = page
+                ["Page"] = page
             });
         _navigation.NavigateTo(uriWithQuerystring);
     }
