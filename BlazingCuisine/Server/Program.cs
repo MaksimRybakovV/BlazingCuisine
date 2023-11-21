@@ -4,6 +4,7 @@ using BlazingCuisine.Server.Services.FileService;
 using BlazingCuisine.Server.Services.RecipeService;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Serilog;
 using System.Reflection;
 
@@ -37,6 +38,16 @@ namespace BlazingCuisine
 
             builder.Host.UseSerilog();
 
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = builder.Configuration["Auth0:Authority"];
+                options.Audience = builder.Configuration["Auth0:ApiIdentifier"];
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -57,6 +68,9 @@ namespace BlazingCuisine
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseSerilogRequestLogging();
 

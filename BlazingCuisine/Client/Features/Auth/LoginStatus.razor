@@ -1,0 +1,22 @@
+﻿@inject NavigationManager _navigation
+
+<div class="container-flex text-end mx-4">
+    <AuthorizeView>
+        <Authorized>
+            <div>
+                Hello, @context.User.Identity!.Name
+                <a href="#" @onclick="BeginSignOut">Log out</a>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <a href="authentication/login">Log in/Sign up</a>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+@code {
+    private void BeginSignOut()
+    {
+        _navigation.NavigateToLogout("authentication/logout");
+    }
+}

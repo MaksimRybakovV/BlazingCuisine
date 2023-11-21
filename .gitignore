@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+*.json
+/BlazingCuisine/Server/appsettings.json
+/BlazingCuisine/Client/wwwroot/appsettings.json
+/BlazingCuisine/Client/wwwroot/appsettings.json
