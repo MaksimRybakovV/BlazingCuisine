@@ -1,10 +1,11 @@
-﻿@inject NavigationManager _navigation
+﻿@using System.Security.Claims
+@inject NavigationManager _navigation
 
 <div class="container-flex text-end mx-4">
     <AuthorizeView>
         <Authorized>
             <div>
-                Hello, @context.User.Identity!.Name
+                Hello, @context.User.Claims.Where(c => c.Type == ClaimTypes.Name).Select(c => c.Value).FirstOrDefault()
                 <a href="#" @onclick="BeginSignOut">Log out</a>
             </div>
         </Authorized>

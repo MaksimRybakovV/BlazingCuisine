@@ -1,8 +1,9 @@
 ﻿@page "/edit-recipe/{RecipeId:int}"
+@attribute [Authorize]
 @using System.Net.Http.Headers;
 @inject HttpClient _client
 
-<div class="container-fluid mt-4">
+<div class="container-fluid">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">

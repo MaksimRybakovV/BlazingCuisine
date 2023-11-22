@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Folder Include="Data\Database\" />
+    <Folder Include="Logs\" />
   </ItemGroup>
 
 

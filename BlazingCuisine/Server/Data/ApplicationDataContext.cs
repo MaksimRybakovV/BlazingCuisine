@@ -14,6 +14,8 @@ namespace BlazingCuisine.Server.Data
                 .HasConversion(
                     l => JsonSerializer.Serialize(l, (JsonSerializerOptions)null!),
                     l => JsonSerializer.Deserialize<List<Ingredient>>(l, (JsonSerializerOptions)null!)!);
+            modelBuilder.Entity<Recipe>().Property(r => r.Owner)
+                .IsRequired();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

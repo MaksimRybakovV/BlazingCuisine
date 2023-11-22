@@ -1,5 +1,7 @@
 ﻿@using System.Net.Http.Headers;
+@using System.Security.Claims
 @inject HttpClient _client
+@inject AuthenticationStateProvider _stateProvider
 
 <EditForm OnValidSubmit="SubmitForm" EditContext="_editContext">
     <FluentValidationValidator />
@@ -248,6 +250,7 @@
 
 @code {
     private EditContext _editContext = default!;
+    private AuthenticationState _state = default!;
     private AddRecipeDto _recipe = new AddRecipeDto
     {
         CategoryId = 1,
@@ -296,6 +299,8 @@
 
         if (response!.Data is not null)
             _categories = response.Data;
+
+        _state = await _stateProvider.GetAuthenticationStateAsync();
     }
 
     private void LoadRecipeImage(InputFileChangeEventArgs args)
@@ -313,9 +318,14 @@
     private async Task SubmitForm()
     {
         if (IsNewRecipe)
+        {
+            _recipe.Owner = _state.User.Claims.Where(c => c.Type == ClaimTypes.Name).Select(c => c.Value).FirstOrDefault()!;
             await OnAddSubmit(_recipe, _recipeImage);
+        }
         else
+        {
             await OnEditSubmit(_updatedRecipe!, _recipeImage);
+        }
     }
 
     public void ResetForm()

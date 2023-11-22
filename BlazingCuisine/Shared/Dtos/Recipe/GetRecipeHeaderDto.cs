@@ -13,5 +13,6 @@ namespace BlazingCuisine.Shared.Dtos.Recipe
         public Category? Category { get; set; }
         public int CategoryId { get; set; }
         public Difficulty Difficulty { get; set; } = Difficulty.Easy;
+        public string Owner { get; set; } = string.Empty;
     }
 }

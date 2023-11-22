@@ -1,10 +1,11 @@
 ﻿@page "/search/{SearchTerm}"
+@using System.Security.Claims
 @inject HttpClient _client
 @inject NavigationManager _navigation
 
 <PageTitle>Search Recipe - Blazing Cuisine</PageTitle>
 
-<div class="container-fluid mt-4">
+<div class="container-fluid">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -27,37 +28,78 @@ else
         <RecipeSearch IsHome=false></RecipeSearch>
         <h3 сlass="my-5">Search results for "@SearchTerm"</h3>
         <SearchFilter SearchTerm="@SearchTerm" OnFiltered="HandleUpdateFilters" Category="@Category" Difficulty="Difficulty" TimeInMinutes="TimeInMinutes"></SearchFilter>
-        <div class="row">
-            <div class="col-lg-12 col-md-12">
-                <RecipeDetails Recipe="_selectedRecipe" />
-                <ViewSwither Items="_recipes" Context="recipe">
-                    <GridTemplate>
-                        <div class="col-lg-4 col-md-6 mt-4">
-                            <RecipeCard Recipe="recipe" OnSelected="HandleRecipeSelected"></RecipeCard>
-                        </div>
-                    </GridTemplate>
-                    <HeaderTemplate>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Cooking Time</th>
-                        <th>Difficulty</th>
-                        <th></th>
-                    </HeaderTemplate>
-                    <RowTemplate>
-                        <th>@recipe.Name</th>
-                        <td>@recipe.Category?.Name</td>
-                        <td>@recipe.TimeFormatter</td>
-                        <td>@recipe.Difficulty</td>
-                        <td class="text-end">
-                            <button class="btn btn-primary"
-                                    @onclick="() => HandleRecipeSelected(recipe)">
-                                <i class="fa-regular fa-eye"></i>
-                            </button>
-                        </td>
-                    </RowTemplate>
-                </ViewSwither>
+        @if(_recipes.Count() == 0)
+        {
+            <AuthorizeView>
+                <Authorized>
+                    <div class="container-fluid text-center">
+                        <i class="fa-solid fa-pizza-slice fa-10x mt-4"></i>
+                        <h3 class="text-muted fw-light mt-4">We currently don't have any recipe, <a href="add-recipe">why not add one?</a></h3>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="container-fluid text-center">
+                        <i class="fa-solid fa-pizza-slice fa-10x mt-4"></i>
+                        <h3 class="text-muted fw-light mt-4">We currently don't have any recipe, why not add one? Please <a href="authentication/login">log in or sign up</a>.</h3>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+        }
+        else
+        {
+            <AuthorizeView>
+                <Authorized>
+                    <div class="mb-4">
+                        <h3 class="fst-italic text-center">Do you have an awesome recipe you'd like to share? <a href="add-recipe">Add it here</a>.</h3>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="mb-4">
+                        <h3 class="fst-italic text-center">Do you have an awesome recipe you'd like to share? Please <a href="authentication/login">log in or sign up</a>.</h3>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+            <div class="row">
+                <div class="col-lg-12 col-md-12">
+                    <RecipeDetails Recipe="_selectedRecipe" />
+                    <ViewSwither Items="_recipes" Context="recipe">
+                        <GridTemplate>
+                            <div class="col-lg-4 col-md-6 mt-4">
+                                <RecipeCard Recipe="recipe" OnSelected="HandleRecipeSelected"></RecipeCard>
+                            </div>
+                        </GridTemplate>
+                        <HeaderTemplate>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Cooking Time</th>
+                            <th>Difficulty</th>
+                            <th></th>
+                        </HeaderTemplate>
+                        <RowTemplate>
+                            <th>@recipe.Name</th>
+                            <td>@recipe.Category?.Name</td>
+                            <td>@recipe.TimeFormatter</td>
+                            <td>@recipe.Difficulty</td>
+                            <td class="text-end">
+                                <AuthorizeView>
+                                    @if (recipe.Owner == @context.User.Claims.Where(c => c.Type == ClaimTypes.Name).Select(c => c.Value).FirstOrDefault())
+                                    {
+                                        <button class="btn btn-outline-primary"
+                                                @onclick="@(() => _navigation.NavigateTo($"edit-recipe/{recipe.Id}"))">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                    }
+                                </AuthorizeView>
+                                <button class="btn btn-primary"
+                                        @onclick="() => HandleRecipeSelected(recipe)">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </td>
+                        </RowTemplate>
+                    </ViewSwither>
+                </div>
             </div>
-        </div>
+        }
         @if (_recipes.Count() > 0 && _pageCount > 1)
         {
             <CardPagination IsMobile="true" Page="Page" PageCount="_pageCount"></CardPagination>

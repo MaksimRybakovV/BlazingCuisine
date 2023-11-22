@@ -15,6 +15,7 @@ namespace BlazingCuisine.Shared.Dtos.Recipe
         public int CategoryId { get; set; }
         public Category? Category { get; set; }
         public Difficulty Difficulty { get; set; } = Difficulty.Easy;
+        public string Owner { get; set; } = string.Empty;
     }
 
     public class RecipeAddValidator: AbstractValidator<AddRecipeDto>

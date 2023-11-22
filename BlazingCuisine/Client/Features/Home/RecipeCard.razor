@@ -1,4 +1,7 @@
-﻿<div class="card shadow">
+﻿@using System.Security.Claims
+@inject NavigationManager _navigation
+
+<div class="card shadow">
     <img src="@Recipe.Photo" class="card-img-top" alt="@Recipe.Name">
     <div class="card-body">
         <h5 class="card-title">@Recipe.Name</h5>
@@ -10,6 +13,14 @@
         <button class="btn btn-primary" @onclick="(async () => await OnSelected.InvokeAsync(Recipe))">
             <i class="fa-regular fa-eye"></i>
         </button>
+        <AuthorizeView>
+            @if (Recipe.Owner == @context.User.Claims.Where(c => c.Type == ClaimTypes.Name).Select(c => c.Value).FirstOrDefault())
+            {
+                <button class="btn btn-outline-primary float-end" @onclick="@(() => _navigation.NavigateTo($"/edit-recipe/{Recipe.Id}"))">
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+            }
+        </AuthorizeView>
     </div>
 </div>
 
