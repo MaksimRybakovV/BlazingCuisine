@@ -16,7 +16,7 @@ namespace BlazingCuisine.Server.Services.FileService
             _enviroment = environment;
         }
 
-        public async Task<UploadResult> UploadImage(IFormFile file, int id)
+        public async Task<UploadResult> UploadImage(IFormFile file, int id, string username)
         {
             var result = new UploadResult();
 
@@ -47,7 +47,8 @@ namespace BlazingCuisine.Server.Services.FileService
                 try
                 {
                     recipe = await _context.Recipes
-                        .FirstOrDefaultAsync(r => r.Id == id);
+                        .FirstOrDefaultAsync(r => r.Id == id)
+                        ?? throw new Exception($"Recipe with Id '{id}' not found!");
                 }
                 catch (Exception ex)
                 {
@@ -57,6 +58,15 @@ namespace BlazingCuisine.Server.Services.FileService
 
                 try
                 {
+                    if (!recipe.Owner.Equals(username))
+                    {
+                        result.IsAuthorized = false;
+                        result.IsUploaded = false;
+                        _logger.LogError("The user is not the author of the recipe with id {recipe.Id}. Access is denied.", recipe.Id);
+
+                        return result;
+                    }
+
                     trustedFileNameForFileStorage = $"img{id}.jpg";
                     var path = Path.Combine(_enviroment.WebRootPath,
                         "images", "recipe", trustedFileNameForFileStorage);

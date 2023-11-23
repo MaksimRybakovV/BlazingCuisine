@@ -1,7 +1,7 @@
 ﻿@page "/add-recipe"
 @attribute [Authorize]
 @using System.Net.Http.Headers;
-@inject HttpClient _client
+@inject IHttpClientFactory _clientFactory
 
 <PageTitle>Add Recipe - Blazing Cuisine</PageTitle>
 
@@ -36,6 +36,12 @@
     private RecipeForm _recipeForm = default!;
     private bool _submitSuccessful;
     private string? _errorMessage;
+    private HttpClient _client = default!;
+
+    protected override void OnInitialized()
+    {
+        _client = _clientFactory.CreateClient("SecureAPIClient");
+    }
 
     private async Task AddRecipe(AddRecipeDto newRecipe, IBrowserFile requestedFile)
     {

@@ -1,7 +1,9 @@
 ﻿using BlazingCuisine.Server.Services.RecipeService;
 using BlazingCuisine.Shared.Dtos.Recipe;
 using BlazingCuisine.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BlazingCuisine.Server.Controllers
 {
@@ -10,10 +12,12 @@ namespace BlazingCuisine.Server.Controllers
     public class RecipesController : ControllerBase
     {
         private readonly IRecipeService _service;
+        private readonly IHttpContextAccessor _context;
 
-        public RecipesController(IRecipeService service)
+        public RecipesController(IRecipeService service, IHttpContextAccessor context)
         {
             _service = service;
+            _context = context;
         }
 
         [HttpGet]
@@ -94,6 +98,7 @@ namespace BlazingCuisine.Server.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<ServiceResponse<int>>> PostRecipe(AddRecipeDto newRecipe)
         {
             var response = await _service.AddRecipeAsync(newRecipe);
@@ -101,10 +106,34 @@ namespace BlazingCuisine.Server.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         [Route("{id}")]
-        public async Task<ActionResult<ServiceResponse<int>>> PutRecipe(UpdateRecipeDto updatedRecipe)
+        public async Task<ActionResult<AuthServiceResponse<UpdateRecipeDto>>> PutRecipe(UpdateRecipeDto updatedRecipe)
         {
-            var response = await _service.UpdateRecipeAsync(updatedRecipe);
+            var username = _context.HttpContext!.User.Identity!.Name;
+
+            var response = await _service.UpdateRecipeAsync(updatedRecipe, username!);
+
+            if (response.IsAuthorized == false)
+                return Unauthorized();
+
+            if (response.Data is null)
+                return NotFound(response);
+
+            return Ok(response);
+        }
+
+        [HttpDelete]
+        [Authorize]
+        [Route("{id}")]
+        public async Task<ActionResult<AuthServiceResponse<string>>> PutRecipe(int id)
+        {
+            var username = _context.HttpContext!.User.Identity!.Name;
+
+            var response = await _service.DeleteRecipeAsync(id, username!);
+
+            if (response.IsAuthorized == false)
+                return Unauthorized();
 
             if (response.Data is null)
                 return NotFound(response);

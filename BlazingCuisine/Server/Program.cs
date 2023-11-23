@@ -29,6 +29,7 @@ namespace BlazingCuisine
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddFluentValidationClientsideAdapters();
             builder.Services.AddValidatorsFromAssembly(Assembly.Load("BlazingCuisine.Shared"));
+            builder.Services.AddHttpContextAccessor();
 
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
