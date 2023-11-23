@@ -1,3 +1,4 @@
+using BlazingCuisine.Client.Features.Auth;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -23,7 +24,7 @@ namespace BlazingCuisine.Client
                 builder.Configuration.Bind("Auth0", options.ProviderOptions);
                 options.ProviderOptions.ResponseType = "code";
                 options.ProviderOptions.AdditionalProviderParameters.Add("audience", builder.Configuration["Auth0:Audience"]);
-            });
+            }).AddAccountClaimsPrincipalFactory<CustomUserFactory<RemoteUserAccount>>();
 
             await builder.Build().RunAsync();
         }

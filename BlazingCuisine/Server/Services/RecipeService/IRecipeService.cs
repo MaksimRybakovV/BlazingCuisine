@@ -13,7 +13,7 @@ namespace BlazingCuisine.Server.Services.RecipeService
         public Task<ServiceResponse<List<GetRecipeHeaderDto>>> GetAllRequestedRecipesAsync(string searchTerm);
         public Task<PageServiceResponse<List<GetRecipeHeaderDto>>> GetRequestedRecipesByPageAsync(string searchTerm, int page, int pageSize, RecipeFilterParameters parameters);
         public Task<ServiceResponse<int>> AddRecipeAsync(AddRecipeDto newRecipe);
-        public Task<AuthServiceResponse<UpdateRecipeDto>> UpdateRecipeAsync(UpdateRecipeDto updatedRecipe, string username);
-        public Task<AuthServiceResponse<string>> DeleteRecipeAsync(int id, string username);
+        public Task<AuthServiceResponse<UpdateRecipeDto>> UpdateRecipeAsync(UpdateRecipeDto updatedRecipe, UserInformation userInformation);
+        public Task<AuthServiceResponse<string>> DeleteRecipeAsync(int id, UserInformation userInformation);
     }
 }

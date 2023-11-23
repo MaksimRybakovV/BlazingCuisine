@@ -236,7 +236,7 @@ namespace BlazingCuisine.Server.Services.RecipeService
             return response;
         }
 
-        public async Task<AuthServiceResponse<UpdateRecipeDto>> UpdateRecipeAsync(UpdateRecipeDto updatedRecipe, string username)
+        public async Task<AuthServiceResponse<UpdateRecipeDto>> UpdateRecipeAsync(UpdateRecipeDto updatedRecipe, UserInformation userInformation)
         {
             var response = new AuthServiceResponse<UpdateRecipeDto>();
 
@@ -246,7 +246,7 @@ namespace BlazingCuisine.Server.Services.RecipeService
                     .SingleOrDefaultAsync(r => r.Id == updatedRecipe.Id)
                     ?? throw new Exception($"Recipe with Id '{updatedRecipe.Id}' not found!");
 
-                if(!recipe.Owner.Equals(username))
+                if(!recipe.Owner.Equals(userInformation.Username) && !userInformation.IsAdministrator)
                 {
                     response.IsAuthorized = false;
                     response.IsSuccessful = false;
@@ -280,7 +280,7 @@ namespace BlazingCuisine.Server.Services.RecipeService
             return response;
         }
 
-        public async Task<AuthServiceResponse<string>> DeleteRecipeAsync(int id, string username)
+        public async Task<AuthServiceResponse<string>> DeleteRecipeAsync(int id, UserInformation userInformation)
         {
             var response = new AuthServiceResponse<string>();
 
@@ -290,7 +290,7 @@ namespace BlazingCuisine.Server.Services.RecipeService
                     .FirstOrDefaultAsync(x => x.Id == id)
                     ?? throw new Exception($"Recipe with Id '{id}' not found!");
 
-                if (!recipe.Owner.Equals(username))
+                if (!recipe.Owner.Equals(userInformation.Username) && !userInformation.IsAdministrator)
                 {
                     response.IsAuthorized = false;
                     response.IsSuccessful = false;

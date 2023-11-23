@@ -16,7 +16,7 @@ namespace BlazingCuisine.Server.Services.FileService
             _enviroment = environment;
         }
 
-        public async Task<UploadResult> UploadImage(IFormFile file, int id, string username)
+        public async Task<UploadResult> UploadImage(IFormFile file, int id, UserInformation userInformation)
         {
             var result = new UploadResult();
 
@@ -58,7 +58,7 @@ namespace BlazingCuisine.Server.Services.FileService
 
                 try
                 {
-                    if (!recipe.Owner.Equals(username))
+                    if (!recipe.Owner.Equals(userInformation.Username) && !userInformation.IsAdministrator)
                     {
                         result.IsAuthorized = false;
                         result.IsUploaded = false;

@@ -110,9 +110,11 @@ namespace BlazingCuisine.Server.Controllers
         [Route("{id}")]
         public async Task<ActionResult<AuthServiceResponse<UpdateRecipeDto>>> PutRecipe(UpdateRecipeDto updatedRecipe)
         {
-            var username = _context.HttpContext!.User.Identity!.Name;
+            var info = new UserInformation();
+            info.Username = _context.HttpContext!.User.Identity!.Name!;
+            info.IsAdministrator = _context.HttpContext!.User.IsInRole("Administrator");
 
-            var response = await _service.UpdateRecipeAsync(updatedRecipe, username!);
+            var response = await _service.UpdateRecipeAsync(updatedRecipe, info);
 
             if (response.IsAuthorized == false)
                 return Unauthorized();
@@ -126,11 +128,13 @@ namespace BlazingCuisine.Server.Controllers
         [HttpDelete]
         [Authorize]
         [Route("{id}")]
-        public async Task<ActionResult<AuthServiceResponse<string>>> PutRecipe(int id)
+        public async Task<ActionResult<AuthServiceResponse<string>>> DeleteRecipe(int id)
         {
-            var username = _context.HttpContext!.User.Identity!.Name;
+            var info = new UserInformation();
+            info.Username = _context.HttpContext!.User.Identity!.Name!;
+            info.IsAdministrator = _context.HttpContext!.User.IsInRole("Administrator");
 
-            var response = await _service.DeleteRecipeAsync(id, username!);
+            var response = await _service.DeleteRecipeAsync(id, info);
 
             if (response.IsAuthorized == false)
                 return Unauthorized();
