@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.Security.Claims
+@using BlazingCuisine.Client.Features.Shared
 @inject NavigationManager _navigation
 @inject HttpClient _client
 
@@ -17,16 +18,14 @@ else
         {
             <AuthorizeView>
                 <Authorized>
-                    <div class="container-fluid text-center">
-                        <i class="fa-solid fa-pizza-slice fa-10x mt-4"></i>
-                        <h3 class="text-muted fw-light mt-4">We currently don't have any recipe, <a href="add-recipe">why not add one?</a></h3>
-                    </div>
+                    <NoRecipes>
+                        We currently don't have any recipe, <a href="add-recipe">why not add one?</a>.
+                    </NoRecipes>
                 </Authorized>
                 <NotAuthorized>
-                    <div class="container-fluid text-center">
-                        <i class="fa-solid fa-pizza-slice fa-10x mt-4"></i>
-                        <h3 class="text-muted fw-light mt-4">We currently don't have any recipe, why not add one? Please <a href="authentication/login">log in or sign up</a>.</h3>
-                    </div>
+                    <NoRecipes>
+                        We currently don't have any recipe, why not add one? Please <a href="authentication/login">log in or sign up</a>.
+                    </NoRecipes>
                 </NotAuthorized>
             </AuthorizeView>
         }
@@ -66,6 +65,11 @@ else
                             <td>@recipe.TimeFormatter</td>
                             <td>@recipe.Difficulty</td>
                             <td class="text-end">
+                                <button class="btn btn-primary"
+                                        @onclick="() => HandleRecipeSelected(recipe)">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                                <FavoriteButton Recipe="recipe" />
                                 <AuthorizeView>
                                     @if (recipe.Owner == @context.User.Claims.Where(c => c.Type == ClaimTypes.Name).Select(c => c.Value).FirstOrDefault())
                                     {
@@ -75,10 +79,6 @@ else
                                         </button>
                                     }
                                 </AuthorizeView>
-                                <button class="btn btn-primary"
-                                        @onclick="() => HandleRecipeSelected(recipe)">
-                                    <i class="fa-regular fa-eye"></i>
-                                </button>
                             </td>
                         </RowTemplate>
                     </ViewSwither>

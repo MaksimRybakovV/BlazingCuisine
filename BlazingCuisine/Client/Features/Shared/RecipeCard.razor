@@ -13,6 +13,7 @@
         <button class="btn btn-primary" @onclick="(async () => await OnSelected.InvokeAsync(Recipe))">
             <i class="fa-regular fa-eye"></i>
         </button>
+        <FavoriteButton Recipe="Recipe" />
         <AuthorizeView>
             @if (Recipe.Owner == @context.User.Claims.Where(c => c.Type == ClaimTypes.Name).Select(c => c.Value).FirstOrDefault())
             {

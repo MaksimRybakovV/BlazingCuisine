@@ -1,0 +1,24 @@
+﻿@using BlazingCuisine.Client.State
+@inject AppState _appState
+
+@if(_appState.FavoriteRecipeState.IsFavorite(Recipe))
+{
+    <button class="btn btn-outline-primary ms-1"
+            title="Favorite"
+            onclick="@(() => _appState.FavoriteRecipeState.RemoteFavorite(Recipe))">
+        <i class="fa-solid fa-heart"></i>
+    </button>
+}
+else
+{
+    <button class="btn btn-outline-primary ms-1"
+            title="Favorite"
+            onclick="@(() => _appState.FavoriteRecipeState.AddFavorite(Recipe))">
+        <i class="fa-regular fa-heart"></i>
+    </button>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public GetRecipeHeaderDto Recipe { get; set; } = default!;
+}

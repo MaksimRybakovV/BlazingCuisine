@@ -1,5 +1,6 @@
 using BlazingCuisine.Client.Features.Auth;
 using BlazingCuisine.Client.State;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -28,6 +29,7 @@ namespace BlazingCuisine.Client
             }).AddAccountClaimsPrincipalFactory<CustomUserFactory<RemoteUserAccount>>();
 
             builder.Services.AddScoped<AppState>();
+            builder.Services.AddBlazoredLocalStorage();
 
             await builder.Build().RunAsync();
         }

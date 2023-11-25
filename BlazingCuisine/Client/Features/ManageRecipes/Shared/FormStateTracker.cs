@@ -24,7 +24,7 @@ namespace BlazingCuisine.Client.Features.ManageRecipes.Shared
 
             if (recipe is AddRecipeDto)
             {
-                _appState?.SaveRecipe((AddRecipeDto)recipe);
+                _appState?.NewRecipeState.SaveRecipe((AddRecipeDto)recipe);
             }
         }
 

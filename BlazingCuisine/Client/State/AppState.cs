@@ -1,26 +1,26 @@
-﻿using BlazingCuisine.Shared.Dtos.Recipe;
-using BlazingCuisine.Shared.Enums;
+﻿using Blazored.LocalStorage;
 
 namespace BlazingCuisine.Client.State
 {
     public class AppState
     {
-        private AddRecipeDto _unsavedNewRecipe = new();
-        public AddRecipeDto UnsavedNewRecipe => _unsavedNewRecipe;
+        private bool _isInitialized;
+        public NewRecipeState NewRecipeState { get; }
+        public FavoriteRecipeState FavoriteRecipeState { get; }
 
-        public void SaveRecipe(AddRecipeDto newRecipe)
+        public AppState(ILocalStorageService localStorage)
         {
-            _unsavedNewRecipe = newRecipe;
+            NewRecipeState = new();
+            FavoriteRecipeState = new(localStorage);
         }
 
-        public void ClearRecipe()
+        public async Task Initialize()
         {
-            _unsavedNewRecipe = new()
+            if(!_isInitialized)
             {
-                CategoryId = 1,
-                Ingredients = new(),
-                Difficulty = Difficulty.Easy
-            };
+                await FavoriteRecipeState.Initialize();
+                _isInitialized = true;
+            }
         }
     }
 }

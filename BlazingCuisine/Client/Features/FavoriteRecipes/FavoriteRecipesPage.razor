@@ -1,0 +1,93 @@
+﻿@page "/favorite-recipes"
+@using BlazingCuisine.Client.State
+@using BlazingCuisine.Client.Features.Shared
+@using System.Security.Claims
+@inject AppState _appState
+@inject NavigationManager _navigation
+@implements IDisposable
+
+<PageTitle>Search Recipe - Blazing Cuisine</PageTitle>
+
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="/">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Favorite Recipes</li>
+        </ol>
+    </nav>
+</div>
+
+@if (_appState.FavoriteRecipeState.FavoriteRecipes.Count() > 0)
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <RecipeDetails Recipe="_selectedRecipe" />
+                <ViewSwither Items="_appState.FavoriteRecipeState.FavoriteRecipes" Context="recipe">
+                    <GridTemplate>
+                        <div class="col-lg-4 col-md-6 mt-4">
+                            <RecipeCard Recipe="recipe" OnSelected="HandleRecipeSelected"></RecipeCard>
+                        </div>
+                    </GridTemplate>
+                    <HeaderTemplate>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Cooking Time</th>
+                        <th>Difficulty</th>
+                        <th></th>
+                    </HeaderTemplate>
+                    <RowTemplate>
+                        <th>@recipe.Name</th>
+                        <td>@recipe.Category?.Name</td>
+                        <td>@recipe.TimeFormatter</td>
+                        <td>@recipe.Difficulty</td>
+                        <td class="text-end">
+                            <button class="btn btn-primary"
+                                    @onclick="() => HandleRecipeSelected(recipe)">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                            <FavoriteButton Recipe="recipe" />
+                            <AuthorizeView>
+                                @if (recipe.Owner == @context.User.Claims.Where(c => c.Type == ClaimTypes.Name).Select(c => c.Value).FirstOrDefault())
+                                {
+                                    <button class="btn btn-outline-primary"
+                                            @onclick="@(() => _navigation.NavigateTo($"edit-recipe/{recipe.Id}"))">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                }
+                            </AuthorizeView>
+                        </td>
+                    </RowTemplate>
+                </ViewSwither>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <NoRecipes>
+        You don't have any favorite recipes :(
+    </NoRecipes>
+}
+
+@code {
+    private GetRecipeHeaderDto? _selectedRecipe;
+
+
+    public void Dispose()
+    {
+        _appState.FavoriteRecipeState.OnChange -= StateHasChanged;
+    }
+
+    protected override void OnInitialized()
+    {
+        _appState.FavoriteRecipeState.OnChange += StateHasChanged;
+    }
+
+    private void HandleRecipeSelected(GetRecipeHeaderDto trail)
+    {
+        _selectedRecipe = trail;
+    }
+}

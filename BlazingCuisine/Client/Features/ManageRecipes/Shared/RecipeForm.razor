@@ -278,7 +278,7 @@
 
     protected override void OnInitialized()
     {
-        _recipe = _appState.UnsavedNewRecipe;
+        _recipe = _appState.NewRecipeState.UnsavedNewRecipe;
         _updatedRecipe = UpdatedRecipe;
         if (UpdatedRecipe == null)
             _editContext = new EditContext(_recipe);
@@ -289,7 +289,7 @@
 
     protected override void OnParametersSet()
     {
-        _recipe = _appState.UnsavedNewRecipe;
+        _recipe = _appState.NewRecipeState.UnsavedNewRecipe;
         _updatedRecipe = UpdatedRecipe;
         if(UpdatedRecipe == null)
             _editContext = new EditContext(_recipe);
@@ -337,7 +337,7 @@
     {
         if(UpdatedRecipe == null)
         {
-            _appState.ClearRecipe();
+            _appState.NewRecipeState.ClearRecipe();
             _recipe = new AddRecipeDto
             {
                 CategoryId = 1,

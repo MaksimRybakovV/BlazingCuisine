@@ -1,4 +1,7 @@
 ﻿@using BlazingCuisine.Client.Features.Auth
+@using BlazingCuisine.Client.State
+@inject AppState _appState
+@implements IDisposable
 
 <nav class="navbar mb-5 shadow">
     <a class="navbar-brand" href="/">
@@ -7,8 +10,19 @@
     </a>
 </nav>
 
-<LoginStatus />
+<div class="container-fluid d-flex justify-content-between mx-3">
+    <p>You have <span class="fw-bold">@_appState.FavoriteRecipeState.FavoriteRecipes.Count()</span><a href="/favorite-recipes"> favorite recipes</a></p>
+    <LoginStatus />
+</div>
 
 @code {
+    protected override void OnInitialized()
+    {
+        _appState.FavoriteRecipeState.OnChange += StateHasChanged;
+    }
 
+    public void Dispose()
+    {
+        _appState.FavoriteRecipeState.OnChange -= StateHasChanged;
+    }
 }
