@@ -1,0 +1,56 @@
+﻿@using BlazingCuisine.Client.Features.Shared
+@inject HttpClient _client
+
+@if(_categories.Count() > 0)
+{
+    <div row>
+        <div class="col-lg-8 offset-lg-2 col-md-12 offset-md-0">
+            <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    @for (int i = 0; i < _categories.Count(); i++)
+                    {
+                        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-label="Slide @(i + 1)"></button>
+                    }
+                </div>
+                <div class="carousel-inner">
+                    @foreach (var category in _categories)
+                    {
+                        <div class="carousel-item @(category.Id == 1 ? "active" : "")">
+                            <img src="@category.Photo" class="d-block w-100" alt="...">
+                            <div class="carousel-caption">
+                                <h5 class="fw-bold fs-1">@category.Name</h5>
+                                <p class="fw-bold fs-3 d-lg-inline d-none">@category.Description</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>  
+    </div>
+}
+else
+{
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+}
+
+@code {
+    private IEnumerable<Category> _categories = new List<Category>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        var response = await _client.GetFromJsonAsync<ServiceResponse<List<Category>>>("api/categories");
+
+        if (response!.Data is not null)
+            _categories = response.Data;
+    }
+}

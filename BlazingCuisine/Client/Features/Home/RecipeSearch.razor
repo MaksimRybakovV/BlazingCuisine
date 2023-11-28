@@ -4,10 +4,11 @@
     @if(IsHome)
     {
         <h1 class="display-4 text-center">Welcome to Blazing Cuisine!</h1>
-        <p class="lead text-center">
+        <p class="lead text-center mb-4">
             Find the most delicious recipes
             with our search!
         </p>
+        <CategoriesCarousel/>
     }
     <p class="mt-4">
         <input @onkeydown="SearchForRecipe"

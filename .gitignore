@@ -364,6 +364,6 @@ FodyWeavers.xsd
 *.json
 /BlazingCuisine/Server/appsettings.json
 /BlazingCuisine/Client/wwwroot/appsettings.json
-/BlazinCuisine/Server/Data/Database/BlazingCuisineDB.db
 /BlazingCuisine/Server/Data/Database/BlazingCuisineDB.db-shm
 /BlazingCuisine/Server/Data/Database/BlazingCuisineDB.db-wal
+/BlazingCuisine/Server/Data/Database/BlazingCuisineDB.db

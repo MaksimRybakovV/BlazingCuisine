@@ -1,0 +1,15 @@
+﻿h5 {
+    -webkit-text-stroke-color: black;
+    -webkit-text-stroke-width: 2px;
+}
+
+p {
+    -webkit-text-stroke-color: black;
+    -webkit-text-stroke-width: 1.5px;
+}
+
+@media (max-width: 770px) {
+    .carousel-indicators {
+        display: none;
+    }
+}
