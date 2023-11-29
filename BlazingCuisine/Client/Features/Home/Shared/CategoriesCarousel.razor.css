@@ -1,11 +1,10 @@
-﻿h5 {
-    -webkit-text-stroke-color: black;
-    -webkit-text-stroke-width: 2px;
+﻿a {
+    text-decoration: none;
+    color: white;
 }
 
-p {
-    -webkit-text-stroke-color: black;
-    -webkit-text-stroke-width: 1.5px;
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 770px) {

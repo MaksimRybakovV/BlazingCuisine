@@ -1,10 +1,10 @@
-﻿@page "/search/{SearchTerm}"
+﻿@page "/category/{CategoryName}"
 @using System.Security.Claims
 @using BlazingCuisine.Client.Features.Shared
-@inject HttpClient _client
 @inject NavigationManager _navigation
+@inject HttpClient _client
 
-<PageTitle>Search Recipe - Blazing Cuisine</PageTitle>
+<PageTitle>@(CategoryName) - Blazing Cuisine</PageTitle>
 
 <div class="container-fluid">
     <nav aria-label="breadcrumb">
@@ -12,12 +12,16 @@
             <li class="breadcrumb-item">
                 <a href="/?Page=1">Home</a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">Search</li>
+            @* There will be a link to the category gallery when it is ready. *@
+            <li class="breadcrumb-item">
+                <a href="#">Categories</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@(CategoryName)</li>
         </ol>
     </nav>
 </div>
 
-@if (_recipes is null)
+@if(_recipes is null)
 {
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -25,16 +29,13 @@
 }
 else
 {
-    <div class="container-fluid mt-4">
-        <RecipeSearch IsHome=false></RecipeSearch>
-        <h3 сlass="my-5">Search results for "@SearchTerm"</h3>
-        <SearchFilter SearchTerm="@SearchTerm" OnFiltered="HandleUpdateFilters" Category="@Category" Difficulty="Difficulty" TimeInMinutes="TimeInMinutes"></SearchFilter>
-        @if(_recipes.Count() == 0)
+    <div class="container-fluid">
+        @if (_recipes.Count() == 0)
         {
             <AuthorizeView>
                 <Authorized>
                     <NoRecipes>
-                        We currently don't have any recipe, <a href="add-recipe">why not add one?</a>
+                        We currently don't have any recipe, <a href="add-recipe">why not add one?</a>.
                     </NoRecipes>
                 </Authorized>
                 <NotAuthorized>
@@ -109,60 +110,38 @@ else
 }
 
 @code {
-    private GetRecipeHeaderDto? _selectedRecipe;
     private IEnumerable<GetRecipeHeaderDto>? _recipes;
+    private GetRecipeHeaderDto? _selectedRecipe;
 
-    private int _pageSize = 1;
+    private int _pageSize = 9;
     private int _pageCount;
 
     [Parameter]
-    public string SearchTerm { get; set; } = default!;
+    public string CategoryName { get; set; } = default!;
 
     [Parameter, SupplyParameterFromQuery]
     public int Page { get; set; }
 
-    [Parameter, SupplyParameterFromQuery]
-    public string? Category { get; set; }
-
-    [Parameter, SupplyParameterFromQuery]
-    public int? TimeInMinutes { get; set; }
-
-    [Parameter, SupplyParameterFromQuery]
-    public int? Difficulty { get; set; }
+    protected override void OnInitialized()
+    {
+        var uriWithQuerystring = _navigation.GetUriWithQueryParameters(
+            new Dictionary<string, object?>()
+                {
+                    ["Page"] = 1
+                });
+        _navigation.NavigateTo(uriWithQuerystring);
+    }
 
     protected async override Task OnParametersSetAsync()
     {
-        if (Category == null && TimeInMinutes == null && Difficulty == null)
-            await LoadData(Page, _pageSize);
-        else
-            await UpdateFilters(Page, _pageSize);
+        await LoadData();
     }
 
-    private async Task LoadData(int page, int pageSize)
+    private async Task LoadData()
     {
         try
         {
-            var response = await _client.GetFromJsonAsync<PageServiceResponse<List<GetRecipeHeaderDto>>>($"api/recipes/search/pagination?searchterm={SearchTerm}&page={page}&pagesize={pageSize}");
-
-            if (response?.Data is not null)
-                _recipes = response.Data;
-
-            _pageCount = response!.PageCount;
-        }
-        catch (HttpRequestException ex)
-        {
-            Console.WriteLine($"There was a problem loading recipes data: {ex.Message}");
-        }
-    }
-
-    private async Task UpdateFilters(int page, int pageSize)
-    {
-        var pointer = _navigation.Uri.IndexOf("?");
-        var str = _navigation.Uri.Substring(pointer + 8);
-
-        try
-        {
-            var response = await _client.GetFromJsonAsync<PageServiceResponse<List<GetRecipeHeaderDto>>>($"api/recipes/search/pagination?searchterm={SearchTerm}&page={page}&pagesize={_pageSize}&{str}");
+            var response = await _client.GetFromJsonAsync<PageServiceResponse<List<GetRecipeHeaderDto>>>($"api/recipes/category/pagination?category={CategoryName}&page={Page}&pagesize={_pageSize}");
 
             if (response?.Data is not null)
                 _recipes = response.Data;
@@ -178,10 +157,5 @@ else
     private void HandleRecipeSelected(GetRecipeHeaderDto trail)
     {
         _selectedRecipe = trail;
-    }
-
-    private void HandleUpdateFilters()
-    {
-        _selectedRecipe = null;
     }
 }
