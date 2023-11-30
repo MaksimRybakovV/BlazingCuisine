@@ -1,0 +1,15 @@
+﻿.container-flex {
+    background: linear-gradient(90deg, rgba(255,255,255,1) 5%, rgba(255,255,255,0.5) 100%), url("../images/Background.jpg") no-repeat center;
+    background-size: cover;
+    height: 9rem;
+    border-top: 2px solid var(--brand);
+}
+
+.container-flex .row {
+    height: 100%;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}

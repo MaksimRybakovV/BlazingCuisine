@@ -3,11 +3,24 @@
 @inject AppState _appState
 @implements IDisposable
 
-<nav class="navbar mb-2 shadow">
+<nav class="navbar navbar-expand-lg mb-2 shadow">
     <a class="navbar-brand" href="/">
         <img class="mx-2" style="width: 100px;" src="/images/Logo.png"/>
         <span class="h3 text-lg-start">Blazing Cuisine</span>
     </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item mx-4">
+                <a class="nav-link fs-4" aria-current="page" href="/?Page=1">Home</a>
+            </li>
+            <li class="nav-item mx-4">
+                <a class="nav-link fs-4" aria-current="page" href="/categories">Categories</a>
+            </li>
+        </ul>
+    </div>
 </nav>
 
 <div class="container-fluid d-flex justify-content-between mx-3">
