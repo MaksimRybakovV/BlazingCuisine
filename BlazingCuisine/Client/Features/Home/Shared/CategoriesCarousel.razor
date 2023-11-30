@@ -16,10 +16,10 @@
                     @foreach (var category in _categories)
                     {
                         <div class="carousel-item @(category.Id == 1 ? "active" : "")">
-                            <a href="@($"category/{category.Name}")"><img src="@category.Photo" class="d-block w-100" alt="@category.Name"></a>
+                            <a href="@($"categories/{category.Name}")"><img src="@category.Photo" class="d-block w-100" alt="@category.Name"></a>
                             <div class="carousel-caption">
-                                <h5 class="fw-bold fs-1"><a href="@($"category/{category.Name}")">@category.Name</a></h5>
-                                <p class="fw-bold fs-3 d-lg-inline d-none"><a href="@($"category/{category.Name}")">@category.Description</a></p>
+                                <h5 class="fw-bold fs-1"><a href="@($"categories/{category.Name}")">@category.Name</a></h5>
+                                <p class="fw-bold fs-3 d-lg-inline d-none"><a href="@($"categories/{category.Name}")">@category.Description</a></p>
                             </div>
                         </div>
                     }

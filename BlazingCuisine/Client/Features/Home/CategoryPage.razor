@@ -1,4 +1,4 @@
-﻿@page "/category/{CategoryName}"
+﻿@page "/categories/{CategoryName}"
 @using System.Security.Claims
 @using BlazingCuisine.Client.Features.Shared
 @inject NavigationManager _navigation
@@ -12,9 +12,8 @@
             <li class="breadcrumb-item">
                 <a href="/?Page=1">Home</a>
             </li>
-            @* There will be a link to the category gallery when it is ready. *@
             <li class="breadcrumb-item">
-                <a href="#">Categories</a>
+                <a href="/categories">Categories</a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">@(CategoryName)</li>
         </ol>
